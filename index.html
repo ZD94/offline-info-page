@@ -166,14 +166,14 @@
     }
 
     .image-stage {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       min-height: 360px;
       height: calc(100vh - 330px);
       max-height: 720px;
       padding: 18px;
-      overflow-x: hidden;
-      overflow-y: auto;
-      scrollbar-gutter: stable;
+      overflow: hidden;
       background:
         linear-gradient(45deg, rgba(255, 255, 255, .025) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, .025) 75%),
         #202733;
@@ -182,9 +182,12 @@
 
     .questionnaire-image {
       display: block;
-      width: 100%;
+      width: auto;
       height: auto;
+      max-width: 100%;
+      max-height: 100%;
       margin: 0 auto;
+      object-fit: contain;
       border-radius: 5px;
       box-shadow: 0 16px 38px rgba(0, 0, 0, .28);
     }
@@ -634,7 +637,6 @@
         pageKicker: document.querySelector('#pageKicker'),
         pageTitle: document.querySelector('#pageTitle'),
         languageLabel: document.querySelector('#languageLabel'),
-        imageStage: document.querySelector('#imageStage'),
         image: document.querySelector('#questionnaireImage'),
         previous: document.querySelector('#previousPage'),
         next: document.querySelector('#nextPage'),
@@ -752,7 +754,6 @@
         updateSelectionStatus()
 
         elements.image.classList.add('is-loading')
-        elements.imageStage.scrollTop = 0
         elements.image.alt = `${screenshotLanguageLabel}问卷第 ${pageNumber} 页：${pageName}`
         elements.image.src = imagePath(SCREENSHOT_LANGUAGE, currentPage)
         renderChineseTexts(currentPage)
