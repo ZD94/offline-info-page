@@ -910,10 +910,15 @@
           const saved = savedReviews[page.name] ?? {}
           return {
             ...page,
-            items: page.items.map(item => ({
-              ...item,
-              text: typeof saved[item.key] === 'string' ? saved[item.key] : item.text
-            }))
+            items: page.items.map(item => {
+              const reviewedText = typeof saved[item.key] === 'string' ? saved[item.key] : item.text
+              return {
+                ...item,
+                text: reviewedText,
+                modified: reviewedText !== item.text,
+                originalText: item.text
+              }
+            })
           }
         })
       }
