@@ -611,7 +611,7 @@
     </section>
   </main>
 
-  <p id="selectionStatus" class="selection-status" role="status" aria-live="polite">当前选择：中文，第 1 页，问卷介绍</p>
+  <p id="selectionStatus" class="selection-status" role="status" aria-live="polite">当前目标语言：中文；截图固定为中文，第 1 页，问卷介绍</p>
 
   <script src="assets/data/zh-questionnaire-text.js"></script>
   <script>
@@ -621,6 +621,7 @@
       const LANGUAGE_STORAGE_KEY = 'multilingual-page:language'
       const PAGE_STORAGE_KEY = 'multilingual-page:questionnaire-page'
       const REVIEW_STORAGE_KEY = 'multilingual-page:manual-review:v1'
+      const SCREENSHOT_LANGUAGE = 'zh'
       const pageNames = [
         '问卷介绍', '设备情况', '性别选择', '主要目标', '锻炼部位',
         '年龄', '身高', '当前体重', '体重风险提示', '目标体重',
@@ -628,7 +629,6 @@
         '目标实现难度', '成功案例', '平台合作', '身体状况总结', '训练计划完成'
       ]
       const languageLabels = { zh: '中文', en: '英文', th: '泰语', ms: '马来语' }
-      const htmlLanguages = { zh: 'zh-CN', en: 'en', th: 'th', ms: 'ms' }
       const languageButtons = Array.from(document.querySelectorAll('.language-button'))
       const elements = {
         pageKicker: document.querySelector('#pageKicker'),
@@ -722,6 +722,10 @@
         return `assets/screenshots/${language}/${String(pageIndex + 1).padStart(2, '0')}.png`
       }
 
+      function updateSelectionStatus () {
+        elements.status.textContent = `当前目标语言：${languageLabels[currentLanguage]}；截图固定为中文，第 ${currentPage + 1} 页，${pageNames[currentPage]}`
+      }
+
       function renderLanguage () {
         languageButtons.forEach(button => {
           const selected = button.dataset.language === currentLanguage
@@ -729,27 +733,28 @@
           button.setAttribute('aria-checked', String(selected))
           button.tabIndex = selected ? 0 : -1
         })
-        document.documentElement.lang = htmlLanguages[currentLanguage]
-        elements.languageLabel.textContent = languageLabels[currentLanguage]
+        document.documentElement.lang = 'zh-CN'
+        elements.languageLabel.textContent = languageLabels[SCREENSHOT_LANGUAGE]
+        updateSelectionStatus()
       }
 
       function renderPage () {
         const pageNumber = currentPage + 1
         const paddedNumber = String(pageNumber).padStart(2, '0')
         const pageName = pageNames[currentPage]
-        const languageLabel = languageLabels[currentLanguage]
+        const screenshotLanguageLabel = languageLabels[SCREENSHOT_LANGUAGE]
 
         elements.pageKicker.textContent = `问卷页面 ${paddedNumber}`
         elements.pageTitle.textContent = pageName
         elements.counter.textContent = `${paddedNumber} / ${pageNames.length}`
         elements.previous.disabled = currentPage === 0
         elements.next.disabled = currentPage === pageNames.length - 1
-        elements.status.textContent = `当前选择：${languageLabel}，第 ${pageNumber} 页，${pageName}`
+        updateSelectionStatus()
 
         elements.image.classList.add('is-loading')
         elements.imageStage.scrollTop = 0
-        elements.image.alt = `${languageLabel}问卷第 ${pageNumber} 页：${pageName}`
-        elements.image.src = imagePath(currentLanguage, currentPage)
+        elements.image.alt = `${screenshotLanguageLabel}问卷第 ${pageNumber} 页：${pageName}`
+        elements.image.src = imagePath(SCREENSHOT_LANGUAGE, currentPage)
         renderChineseTexts(currentPage)
         renderManualReview(currentPage)
 
@@ -958,7 +963,6 @@
         currentLanguage = language
         writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
         renderLanguage()
-        renderPage()
 
         if (announce) {
           document.dispatchEvent(new CustomEvent('languagechange', {
@@ -977,7 +981,7 @@
       function preloadAdjacentImage (pageIndex) {
         if (pageIndex < 0 || pageIndex >= pageNames.length) return
         const image = new Image()
-        image.src = imagePath(currentLanguage, pageIndex)
+        image.src = imagePath(SCREENSHOT_LANGUAGE, pageIndex)
       }
 
       languageButtons.forEach((button, index) => {
@@ -1007,7 +1011,7 @@
       elements.image.addEventListener('load', function () { elements.image.classList.remove('is-loading') })
       elements.image.addEventListener('error', function () {
         elements.image.classList.remove('is-loading')
-        elements.status.textContent = `${languageLabels[currentLanguage]}第 ${currentPage + 1} 页截图加载失败`
+        elements.status.textContent = `中文第 ${currentPage + 1} 页截图加载失败`
       })
 
       renderLanguage()
