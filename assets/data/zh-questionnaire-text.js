@@ -24,72 +24,87 @@ window.QUESTIONNAIRE_TEXTS = [
     "screenshot": "02-设备情况.png",
     "items": [
       {
-        "key": "question-device|com.onespax.int.spax:id/multiple_program_text|text|1",
+        "key": "question-device|manual|text|1",
         "text": "设备",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/multiple_title|text|1",
+        "key": "question-device|manual|text|2",
         "text": "选择您的健身设备",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_radio_text|text|1",
+        "key": "question-device|manual|text|3",
         "text": "跑步机",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_radio_text|text|2",
-        "text": "动感单车",
-        "dynamic": false
-      },
-      {
-        "key": "question-device|com.onespax.int.spax:id/tv_radio_text|text|3",
+        "key": "question-device|manual|text|4",
         "text": "哑铃",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_radio_text|text|4",
-        "text": "椭圆机",
+        "key": "question-device|manual|text|5",
+        "text": "动感单车",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_radio_text|text|5",
+        "key": "question-device|manual|text|6",
         "text": "普拉提",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_radio_text|text|6",
-        "text": "划船机",
+        "key": "question-device|manual|text|7",
+        "text": "椭圆机",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_radio_text|text|7",
+        "key": "question-device|manual|text|8",
         "text": "桌下椭圆机",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_radio_text|text|8",
-        "text": "健身垫",
+        "key": "question-device|manual|text|9",
+        "text": "划船机",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_radio_text|text|9",
+        "key": "question-device|manual|text|10",
         "text": "深蹲骑马机",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_radio_text|text|10",
+        "key": "question-device|manual|text|11",
+        "text": "健身垫",
+        "dynamic": false
+      },
+      {
+        "key": "question-device|manual|text|12",
+        "text": "美腰机",
+        "dynamic": false
+      },
+      {
+        "key": "question-device|manual|text|13",
+        "text": "爬楼机",
+        "dynamic": false
+      },
+      {
+        "key": "question-device|manual|text|14",
         "text": "其他",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_next|text|1",
+        "key": "question-device|manual|text|15",
+        "text": "I have everything ready.",
+        "dynamic": false
+      },
+      {
+        "key": "question-device|manual|text|16",
         "text": "下一步",
         "dynamic": false
       },
       {
-        "key": "question-device|com.onespax.int.spax:id/tv_have_no_device|text|1",
+        "key": "question-device|manual|text|17",
         "text": "暂无设备",
         "dynamic": false
       }
@@ -211,77 +226,47 @@ window.QUESTIONNAIRE_TEXTS = [
     "screenshot": "06-年龄.png",
     "items": [
       {
-        "key": "question-age|com.onespax.int.spax:id/multiple_program_text|text|1",
+        "key": "question-age|manual|text|1",
         "text": "关于您",
         "dynamic": false
       },
       {
-        "key": "question-age|com.onespax.int.spax:id/multiple_title|text|1",
+        "key": "question-age|manual|text|2",
         "text": "您的年龄是？",
         "dynamic": false
       },
       {
-        "key": "question-age|com.onespax.int.spax:id/tv_age_value|text|1",
-        "text": "≤20",
-        "dynamic": false
+        "key": "question-age|manual|text|3",
+        "text": "20",
+        "dynamic": true
       },
       {
-        "key": "question-age|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.2.0.1|text|1",
+        "key": "question-age|manual|text|4",
+        "text": "21",
+        "dynamic": true
+      },
+      {
+        "key": "question-age|manual|text|5",
+        "text": "22",
+        "dynamic": true
+      },
+      {
+        "key": "question-age|manual|text|6",
         "text": "岁",
         "dynamic": false
       },
       {
-        "key": "question-age|com.onespax.int.spax:id/tv_age_value|text|2",
-        "text": "21~25",
-        "dynamic": false
+        "key": "question-age|manual|text|7",
+        "text": "23",
+        "dynamic": true
       },
       {
-        "key": "question-age|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.2.1.1|text|1",
-        "text": "岁",
-        "dynamic": false
+        "key": "question-age|manual|text|8",
+        "text": "24",
+        "dynamic": true
       },
       {
-        "key": "question-age|com.onespax.int.spax:id/tv_age_value|text|3",
-        "text": "26~30",
-        "dynamic": false
-      },
-      {
-        "key": "question-age|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.2.2.1|text|1",
-        "text": "岁",
-        "dynamic": false
-      },
-      {
-        "key": "question-age|com.onespax.int.spax:id/tv_age_value|text|4",
-        "text": "31~35",
-        "dynamic": false
-      },
-      {
-        "key": "question-age|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.2.3.1|text|1",
-        "text": "岁",
-        "dynamic": false
-      },
-      {
-        "key": "question-age|com.onespax.int.spax:id/tv_age_value|text|5",
-        "text": "36~40",
-        "dynamic": false
-      },
-      {
-        "key": "question-age|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.2.4.1|text|1",
-        "text": "岁",
-        "dynamic": false
-      },
-      {
-        "key": "question-age|com.onespax.int.spax:id/tv_age_value|text|6",
-        "text": ">40",
-        "dynamic": false
-      },
-      {
-        "key": "question-age|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.2.5.1|text|1",
-        "text": "岁",
-        "dynamic": false
-      },
-      {
-        "key": "question-age|com.onespax.int.spax:id/tv_next|text|1",
+        "key": "question-age|manual|text|9",
         "text": "下一步",
         "dynamic": false
       }
@@ -337,52 +322,57 @@ window.QUESTIONNAIRE_TEXTS = [
     "screenshot": "08-当前体重.png",
     "items": [
       {
-        "key": "question-current-weight|com.onespax.int.spax:id/multiple_program_text|text|1",
+        "key": "question-current-weight|manual|text|1",
         "text": "关于您",
         "dynamic": false
       },
       {
-        "key": "question-current-weight|com.onespax.int.spax:id/scroll_title|text|1",
-        "text": "您目前的体重是？",
+        "key": "question-current-weight|manual|text|2",
+        "text": "你目前的体重是多少？",
         "dynamic": false
       },
       {
-        "key": "question-current-weight|com.onespax.int.spax:id/tv_weight_unit_lbs|text|1",
+        "key": "question-current-weight|manual|text|3",
         "text": "lbs",
         "dynamic": false
       },
       {
-        "key": "question-current-weight|com.onespax.int.spax:id/tv_weight_unit_kg|text|1",
+        "key": "question-current-weight|manual|text|4",
         "text": "kg",
         "dynamic": false
       },
       {
-        "key": "question-current-weight|com.onespax.int.spax:id/tv_weight_value|text|1",
-        "text": "172",
+        "key": "question-current-weight|manual|text|5",
+        "text": "114.5",
         "dynamic": true
       },
       {
-        "key": "question-current-weight|com.onespax.int.spax:id/tv_weight_value_unit|text|1",
+        "key": "question-current-weight|manual|text|6",
         "text": "lbs",
         "dynamic": false
       },
       {
-        "key": "question-current-weight|com.onespax.int.spax:id/tv_show_bmi|text|1",
-        "text": "BMI 26.2",
+        "key": "question-current-weight|manual|text|7",
+        "text": "BMI19.1",
         "dynamic": false
       },
       {
-        "key": "question-current-weight|com.onespax.int.spax:id/tv_bmi_level|text|1",
-        "text": "超重",
+        "key": "question-current-weight|manual|text|8",
+        "text": "健康体重",
         "dynamic": false
       },
       {
-        "key": "question-current-weight|com.onespax.int.spax:id/weight_bmi_hint|text|1",
-        "text": "您的体型已超重；需要大量锻炼和饮食调整。",
+        "key": "question-current-weight|manual|text|9",
+        "text": "💪🏻",
         "dynamic": false
       },
       {
-        "key": "question-current-weight|com.onespax.int.spax:id/tv_next|text|1",
+        "key": "question-current-weight|manual|text|10",
+        "text": "你的体重处于健康范围。让我们按照适合你的节奏，逐步提升力量和耐力。",
+        "dynamic": false
+      },
+      {
+        "key": "question-current-weight|manual|text|11",
         "text": "下一步",
         "dynamic": false
       }
@@ -395,62 +385,62 @@ window.QUESTIONNAIRE_TEXTS = [
     "screenshot": "09-体重风险提示.png",
     "items": [
       {
-        "key": "question-bmi-risk|com.onespax.int.spax:id/tv_warning_icon|text|1",
+        "key": "question-bmi-risk|manual|text|1",
         "text": "⚠️",
         "dynamic": false
       },
       {
-        "key": "question-bmi-risk|com.onespax.int.spax:id/tv_title|text|1",
-        "text": "您的BMI已达到26.2",
+        "key": "question-bmi-risk|manual|text|2",
+        "text": "你的 BMI：43.9",
         "dynamic": false
       },
       {
-        "key": "question-bmi-risk|com.onespax.int.spax:id/tv_subtitle|text|1",
-        "text": "超重",
+        "key": "question-bmi-risk|manual|text|3",
+        "text": "重度肥胖",
         "dynamic": false
       },
       {
-        "key": "question-bmi-risk|com.onespax.int.spax:id/tv_bmi_warning_tips1|text|1",
-        "text": "心血管疾病 风险 +30%",
+        "key": "question-bmi-risk|manual|text|4",
+        "text": "心脏疾病\n风险增加 30%",
         "dynamic": false
       },
       {
-        "key": "question-bmi-risk|com.onespax.int.spax:id/tv_bmi_warning_tips2|text|1",
-        "text": "高血压 风险 +30%",
+        "key": "question-bmi-risk|manual|text|5",
+        "text": "高血压\n风险增加 30%",
         "dynamic": false
       },
       {
-        "key": "question-bmi-risk|com.onespax.int.spax:id/tv_bmi_warning_tips3|text|1",
-        "text": "糖尿病 风险 +30%",
+        "key": "question-bmi-risk|manual|text|6",
+        "text": "2 型糖尿病\n风险增加",
         "dynamic": false
       },
       {
-        "key": "question-bmi-risk|com.onespax.int.spax:id/tv_bmi_warning_tips4|text|1",
-        "text": "动脉粥样硬化 风险 +30%",
+        "key": "question-bmi-risk|manual|text|7",
+        "text": "中风\n风险增加 30%",
         "dynamic": false
       },
       {
-        "key": "question-bmi-risk|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.0.0.0.5.0.0.0|text|1",
-        "text": "3x",
+        "key": "question-bmi-risk|manual|text|8",
+        "text": "3 倍",
         "dynamic": false
       },
       {
-        "key": "question-bmi-risk|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.0.0.0.5.0.0.1|text|1",
-        "text": "BMI每升高一个等级，患病风险增加数倍。数据来自世界卫生组织。",
+        "key": "question-bmi-risk|manual|text|9",
+        "text": "BMI 每升高一个等级，患病风险就会增加至原来的 3 倍。来源：世界卫生组织（WHO）。",
         "dynamic": false
       },
       {
-        "key": "question-bmi-risk|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.0.0.0.5.0.1.0|text|1",
+        "key": "question-bmi-risk|manual|text|10",
         "text": "50%",
         "dynamic": true
       },
       {
-        "key": "question-bmi-risk|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.0.0.0.5.0.1.1|text|1",
-        "text": "的肥胖人群曾遭受过歧视。",
+        "key": "question-bmi-risk|manual|text|11",
+        "text": "的成年人表示曾因体重而遭受偏见。你并不孤单。",
         "dynamic": false
       },
       {
-        "key": "question-bmi-risk|com.onespax.int.spax:id/tv_next|text|1",
+        "key": "question-bmi-risk|manual|text|12",
         "text": "下一步",
         "dynamic": false
       }
@@ -541,32 +531,52 @@ window.QUESTIONNAIRE_TEXTS = [
     "screenshot": "11-减重计划.png",
     "items": [
       {
-        "key": "question-weight-plan|com.onespax.int.spax:id/multiple_program_text|text|1",
+        "key": "question-weight-plan|manual|text|1",
         "text": "关于您",
         "dynamic": false
       },
       {
-        "key": "question-weight-plan|com.onespax.int.spax:id/tv_title|text|1",
-        "text": "根据SPAX计划，我们预测您将在...",
+        "key": "question-weight-plan|manual|text|2",
+        "text": "有了 SPAX 训练计划，你有望达成",
         "dynamic": false
       },
       {
-        "key": "question-weight-plan|com.onespax.int.spax:id/tv_weight_summary|text|1",
-        "text": "56天后达到163lbs。",
+        "key": "question-weight-plan|manual|text|3",
+        "text": "106 lbs，仅需 54 天",
         "dynamic": false
       },
       {
-        "key": "question-weight-plan|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.1.0.5|text|1",
-        "text": "👏太棒了！",
+        "key": "question-weight-plan|manual|text|4",
+        "text": "106lbs",
+        "dynamic": true
+      },
+      {
+        "key": "question-weight-plan|manual|text|5",
+        "text": "106lbs",
+        "dynamic": true
+      },
+      {
+        "key": "question-weight-plan|manual|text|6",
+        "text": "今天",
         "dynamic": false
       },
       {
-        "key": "question-weight-plan|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.1.0.6|text|1",
-        "text": "让我们更好地了解您的身体吧！",
+        "key": "question-weight-plan|manual|text|7",
+        "text": "54日期",
+        "dynamic": true
+      },
+      {
+        "key": "question-weight-plan|manual|text|8",
+        "text": "让我们进一步完善你的专属计划！",
         "dynamic": false
       },
       {
-        "key": "question-weight-plan|com.onespax.int.spax:id/tv_next|text|1",
+        "key": "question-weight-plan|manual|text|9",
+        "text": "告诉我们你的运动水平，以便为你定制更合适的训练课程。",
+        "dynamic": false
+      },
+      {
+        "key": "question-weight-plan|manual|text|10",
         "text": "下一步",
         "dynamic": false
       }
@@ -688,9 +698,77 @@ window.QUESTIONNAIRE_TEXTS = [
   },
   {
     "order": 15,
+    "name": "question-plan-upgrade",
+    "label": "专属升级计划",
+    "screenshot": "15-专属升级计划.png",
+    "items": [
+      {
+        "key": "question-plan-upgrade|manual|text|1",
+        "text": "你的**专属升级计划**",
+        "dynamic": false
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|2",
+        "text": "**提前 12 天 天达成目标！**",
+        "dynamic": false
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|3",
+        "text": "我们根据你的运动水平和训练偏好，为你量身定制了专属计划。",
+        "dynamic": false
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|4",
+        "text": "106lbs",
+        "dynamic": true
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|5",
+        "text": "106lbs",
+        "dynamic": true
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|6",
+        "text": "今天",
+        "dynamic": false
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|7",
+        "text": "12月17日",
+        "dynamic": true
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|8",
+        "text": "12月29日",
+        "dynamic": true
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|9",
+        "text": "为你量身打造",
+        "dynamic": false
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|10",
+        "text": "根据你的运动水平和偏好的训练强度，定制专属课程。",
+        "dynamic": false
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|11",
+        "text": "预计时间仅供参考，实际效果可能有所不同。",
+        "dynamic": false
+      },
+      {
+        "key": "question-plan-upgrade|manual|text|12",
+        "text": "下一步",
+        "dynamic": false
+      }
+    ]
+  },
+  {
+    "order": 16,
     "name": "question-boredom",
     "label": "运动枯燥度",
-    "screenshot": "15-运动枯燥度.png",
+    "screenshot": "16-运动枯燥度.png",
     "items": [
       {
         "key": "question-boredom|com.onespax.int.spax:id/multiple_program_text|text|1",
@@ -715,10 +793,10 @@ window.QUESTIONNAIRE_TEXTS = [
     ]
   },
   {
-    "order": 16,
+    "order": 17,
     "name": "question-goal-difficulty",
     "label": "目标实现难度",
-    "screenshot": "16-目标实现难度.png",
+    "screenshot": "17-目标实现难度.png",
     "items": [
       {
         "key": "question-goal-difficulty|com.onespax.int.spax:id/multiple_program_text|text|1",
@@ -743,10 +821,10 @@ window.QUESTIONNAIRE_TEXTS = [
     ]
   },
   {
-    "order": 17,
+    "order": 18,
     "name": "question-social-proof",
     "label": "成功案例",
-    "screenshot": "17-成功案例.png",
+    "screenshot": "18-成功案例.png",
     "items": [
       {
         "key": "question-social-proof|com.onespax.int.spax:id/multiple_program_text|text|1",
@@ -791,10 +869,10 @@ window.QUESTIONNAIRE_TEXTS = [
     ]
   },
   {
-    "order": 18,
+    "order": 19,
     "name": "question-partnership",
     "label": "平台合作",
-    "screenshot": "18-平台合作.png",
+    "screenshot": "19-平台合作.png",
     "items": [
       {
         "key": "question-partnership|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.0.0.1.1|text|1",
@@ -809,10 +887,10 @@ window.QUESTIONNAIRE_TEXTS = [
     ]
   },
   {
-    "order": 19,
+    "order": 20,
     "name": "question-summary",
     "label": "身体状况总结",
-    "screenshot": "19-身体状况总结.png",
+    "screenshot": "20-身体状况总结.png",
     "items": [
       {
         "key": "question-summary|com.onespax.int.spax:id/tv_title|text|1",
@@ -937,288 +1015,301 @@ window.QUESTIONNAIRE_TEXTS = [
     ]
   },
   {
-    "order": 20,
-    "name": "question-plan-ready",
-    "label": "训练计划完成",
-    "screenshot": "20-训练计划完成.png",
+    "order": 21,
+    "name": "question-injury-history",
+    "label": "受伤经历",
+    "screenshot": "21-受伤经历.png",
     "items": [
       {
-        "key": "question-plan-ready|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.0.0.0.0|text|1",
+        "key": "question-injury-history|manual|text|1",
+        "text": "30%",
+        "dynamic": true
+      },
+      {
+        "key": "question-injury-history|manual|text|2",
+        "text": "教练正在分析您的资料...",
+        "dynamic": false
+      },
+      {
+        "key": "question-injury-history|manual|text|3",
+        "text": "560万用户",
+        "dynamic": false
+      },
+      {
+        "key": "question-injury-history|manual|text|4",
+        "text": "选择了 SPAX!",
+        "dynamic": false
+      },
+      {
+        "key": "question-injury-history|manual|text|5",
+        "text": "你是否有过受伤经历?",
+        "dynamic": false
+      },
+      {
+        "key": "question-injury-history|manual|text|6",
+        "text": "没有",
+        "dynamic": false
+      },
+      {
+        "key": "question-injury-history|manual|text|7",
+        "text": "脚踝",
+        "dynamic": false
+      },
+      {
+        "key": "question-injury-history|manual|text|8",
+        "text": "背部",
+        "dynamic": false
+      },
+      {
+        "key": "question-injury-history|manual|text|9",
+        "text": "膝盖",
+        "dynamic": false
+      },
+      {
+        "key": "question-injury-history|manual|text|10",
+        "text": "手腕",
+        "dynamic": false
+      },
+      {
+        "key": "question-injury-history|manual|text|11",
+        "text": "腿部",
+        "dynamic": false
+      },
+      {
+        "key": "question-injury-history|manual|text|12",
+        "text": "下一步",
+        "dynamic": false
+      }
+    ]
+  },
+  {
+    "order": 22,
+    "name": "question-plan-ready",
+    "label": "训练计划完成",
+    "screenshot": "22-训练计划完成.png",
+    "items": [
+      {
+        "key": "question-plan-ready|manual|text|1",
         "text": "您的训练计划已就绪。",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_solve_days|text|1",
-        "text": "仅需 56 天解决问题！",
+        "key": "question-plan-ready|manual|text|2",
+        "text": "在42天内减重至106lbs!",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_weight_value|text|1",
-        "text": "163.0",
+        "key": "question-plan-ready|manual|text|3",
+        "text": "106",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_weight_unit|text|1",
+        "key": "question-plan-ready|manual|text|4",
         "text": "lbs",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_weight_day|text|1",
-        "text": "第 56 天",
+        "key": "question-plan-ready|manual|text|5",
+        "text": "第 42 天",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.0.0.0.2.0.0|text|1",
+        "key": "question-plan-ready|manual|text|6",
+        "text": "BMI 17.7",
+        "dynamic": false
+      },
+      {
+        "key": "question-plan-ready|manual|text|7",
+        "text": "17.7",
+        "dynamic": true
+      },
+      {
+        "key": "question-plan-ready|manual|text|8",
+        "text": "今天",
+        "dynamic": false
+      },
+      {
+        "key": "question-plan-ready|manual|text|9",
+        "text": "12月17日",
+        "dynamic": true
+      },
+      {
+        "key": "question-plan-ready|manual|text|10",
         "text": "您的日历",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_current_month|text|1",
-        "text": "Nov. 2026",
-        "dynamic": false
+        "key": "question-plan-ready|manual|text|11",
+        "text": "2026年11月",
+        "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_week_day|text|1",
+        "key": "question-plan-ready|manual|text|12",
         "text": "Sun",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_week_day|text|2",
+        "key": "question-plan-ready|manual|text|13",
         "text": "Mon",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_week_day|text|3",
+        "key": "question-plan-ready|manual|text|14",
         "text": "Tue",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_week_day|text|4",
+        "key": "question-plan-ready|manual|text|15",
         "text": "Wed",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_week_day|text|5",
+        "key": "question-plan-ready|manual|text|16",
         "text": "Thu",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_week_day|text|6",
+        "key": "question-plan-ready|manual|text|17",
         "text": "Fri",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_week_day|text|7",
+        "key": "question-plan-ready|manual|text|18",
         "text": "Sat",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|1",
-        "text": "1",
+        "key": "question-plan-ready|manual|text|19",
+        "text": "01",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|2",
-        "text": "2",
+        "key": "question-plan-ready|manual|text|20",
+        "text": "02",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|3",
-        "text": "3",
+        "key": "question-plan-ready|manual|text|21",
+        "text": "03",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|4",
+        "key": "question-plan-ready|manual|text|22",
+        "text": "04",
+        "dynamic": true
+      },
+      {
+        "key": "question-plan-ready|manual|text|23",
         "text": "Start",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|5",
-        "text": "5",
+        "key": "question-plan-ready|manual|text|24",
+        "text": "06",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|1",
-        "text": "胸部",
-        "dynamic": false
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|6",
-        "text": "6",
+        "key": "question-plan-ready|manual|text|25",
+        "text": "07",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|2",
+        "key": "question-plan-ready|manual|text|26",
         "text": "腹部",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|7",
-        "text": "7",
+        "key": "question-plan-ready|manual|text|27",
+        "text": "08",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|8",
-        "text": "8",
-        "dynamic": true
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|3",
+        "key": "question-plan-ready|manual|text|28",
         "text": "腿部",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|9",
-        "text": "9",
+        "key": "question-plan-ready|manual|text|29",
+        "text": "09",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|4",
-        "text": "手臂",
-        "dynamic": false
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|10",
+        "key": "question-plan-ready|manual|text|30",
         "text": "10",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|5",
+        "key": "question-plan-ready|manual|text|31",
         "text": "胸部",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|11",
+        "key": "question-plan-ready|manual|text|32",
         "text": "11",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|12",
+        "key": "question-plan-ready|manual|text|33",
+        "text": "腹部",
+        "dynamic": false
+      },
+      {
+        "key": "question-plan-ready|manual|text|34",
         "text": "12",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|13",
-        "text": "13",
-        "dynamic": true
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|6",
-        "text": "腹部",
-        "dynamic": false
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|14",
-        "text": "14",
-        "dynamic": true
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|7",
+        "key": "question-plan-ready|manual|text|35",
         "text": "腿部",
         "dynamic": false
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|15",
+        "key": "question-plan-ready|manual|text|36",
+        "text": "13",
+        "dynamic": true
+      },
+      {
+        "key": "question-plan-ready|manual|text|37",
+        "text": "14",
+        "dynamic": true
+      },
+      {
+        "key": "question-plan-ready|manual|text|38",
         "text": "15",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|16",
+        "key": "question-plan-ready|manual|text|39",
         "text": "16",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|8",
-        "text": "手臂",
-        "dynamic": false
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|17",
+        "key": "question-plan-ready|manual|text|40",
         "text": "17",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|18",
+        "key": "question-plan-ready|manual|text|41",
         "text": "18",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|9",
-        "text": "胸部",
-        "dynamic": false
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|19",
+        "key": "question-plan-ready|manual|text|42",
         "text": "19",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|20",
+        "key": "question-plan-ready|manual|text|43",
         "text": "20",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|10",
-        "text": "腹部",
-        "dynamic": false
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|21",
+        "key": "question-plan-ready|manual|text|44",
         "text": "21",
         "dynamic": true
       },
       {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_last_month|text|1",
-        "text": "Dec. 2026",
-        "dynamic": false
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|22",
-        "text": "27",
-        "dynamic": true
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|23",
-        "text": "28",
-        "dynamic": true
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_part|text|11",
-        "text": "胸部",
-        "dynamic": false
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|24",
-        "text": "163 LBS",
-        "dynamic": true
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|25",
-        "text": "30",
-        "dynamic": true
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|26",
-        "text": "31",
-        "dynamic": true
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|27",
-        "text": "1",
-        "dynamic": true
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_calender_training_day|text|28",
-        "text": "2",
-        "dynamic": true
-      },
-      {
-        "key": "question-plan-ready|android.widget.TextView@0.0.0.0.0.0.0.0.1.0.0.0.0.3|text|1",
-        "text": "训练旅程阶段",
-        "dynamic": false
-      },
-      {
-        "key": "question-plan-ready|com.onespax.int.spax:id/tv_next|text|1",
+        "key": "question-plan-ready|manual|text|45",
         "text": "下一步",
         "dynamic": false
       }

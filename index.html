@@ -75,6 +75,7 @@
       color: #4c586d;
       background: transparent;
       font-weight: 700;
+      white-space: nowrap;
       cursor: pointer;
       transition: color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease;
     }
@@ -245,6 +246,12 @@
       min-height: min(72vh, 720px);
     }
 
+    .ai-language-badge {
+      color: #315f83;
+      border-color: #bdd7e8;
+      background: #edf7fc;
+    }
+
     .content-heading {
       display: flex;
       align-items: flex-start;
@@ -380,6 +387,110 @@
       border-radius: 14px;
       color: var(--muted);
       text-align: center;
+    }
+
+    .ai-translation-list {
+      display: grid;
+      gap: 12px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .ai-translation-item {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1px solid #dce6ee;
+      border-radius: 14px;
+      background: var(--surface);
+    }
+
+    .translation-pair {
+      display: grid;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .translation-block {
+      min-width: 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f7f9fc;
+    }
+
+    .translation-block.is-target {
+      border: 1px solid #cfe2ee;
+      background: #f1f8fc;
+    }
+
+    .translation-block.is-deepseek {
+      border: 1px solid #ddd3f0;
+      background: #f8f5fc;
+    }
+
+    .translation-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .translation-label {
+      color: #718096;
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .08em;
+    }
+
+    .translation-block.is-target .translation-label { color: #315f83; }
+    .translation-block.is-deepseek .translation-label { color: #694b8e; }
+
+    .translation-value {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .translation-arrow {
+      width: 26px;
+      height: 20px;
+      margin: -5px 0 -5px 10px;
+      color: #7f94a8;
+      font-size: 17px;
+      font-weight: 900;
+      line-height: 20px;
+      text-align: center;
+    }
+
+    .translation-status-badge {
+      flex: 0 0 auto;
+      padding: 3px 7px;
+      border-radius: 999px;
+      color: #17613b;
+      background: #e7f7ee;
+      font-size: 10px;
+      font-weight: 850;
+    }
+
+    .translation-status-badge.is-dynamic {
+      color: #7a5b16;
+      background: #fff4d6;
+    }
+
+    .translation-status-badge.is-model {
+      color: #62448a;
+      background: #eee7f8;
+    }
+
+    .translation-status-badge.is-missing {
+      color: #8b3a3a;
+      background: #fdecec;
     }
 
     .review-text-list {
@@ -526,6 +637,7 @@
       .content-heading { gap: 10px; }
       .baseline-title { font-size: 25px; }
       .chinese-text-item { grid-template-columns: 34px minmax(0, 1fr); }
+      .ai-translation-item { grid-template-columns: 34px minmax(0, 1fr); }
       .review-text-item { grid-template-columns: 34px minmax(0, 1fr); }
       .dynamic-badge { grid-column: 2; justify-self: start; }
     }
@@ -539,6 +651,11 @@
         <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="en">英文</button>
         <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="th">泰语</button>
         <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="ms">马来语</button>
+        <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="de">德语</button>
+        <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="tr">土耳其语</button>
+        <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="fr">法语</button>
+        <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="uk">乌克兰语</button>
+        <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="ar-SA">阿拉伯语（沙特）</button>
       </div>
     </div>
   </header>
@@ -559,7 +676,7 @@
 
       <nav class="page-navigation" aria-label="问卷截图翻页">
         <button id="previousPage" class="page-button" type="button" disabled>← 上一页</button>
-        <span id="pageCounter" class="page-counter">01 / 20</span>
+        <span id="pageCounter" class="page-counter">01 / 22</span>
         <button id="nextPage" class="page-button" type="button">下一页 →</button>
       </nav>
     </aside>
@@ -585,7 +702,19 @@
     <section class="content-area ai-panel" aria-labelledby="aiTranslationTitle">
       <div class="baseline-heading">
         <h2 id="aiTranslationTitle" class="baseline-title">AI翻译</h2>
+        <span id="aiLanguageBadge" class="readonly-badge ai-language-badge">中文校对</span>
       </div>
+      <div class="content-heading">
+        <div>
+          <p id="aiTranslationKicker" class="content-kicker">问卷页面 01</p>
+          <h3 id="aiTranslationPageTitle" class="content-title">问卷介绍</h3>
+        </div>
+      </div>
+      <div class="content-summary">
+        <span id="aiTranslationSummary">中文原文 → Codex 中文校对</span>
+        <span id="aiTranslationCount" class="text-count">0 条</span>
+      </div>
+      <ol id="aiTranslationList" class="ai-translation-list" aria-live="polite"></ol>
     </section>
 
     <section class="content-area review-panel" aria-labelledby="manualReviewTitle">
@@ -617,6 +746,8 @@
   <p id="selectionStatus" class="selection-status" role="status" aria-live="polite">当前目标语言：中文；截图固定为中文，第 1 页，问卷介绍</p>
 
   <script src="assets/data/zh-questionnaire-text.js"></script>
+  <script src="assets/data/ai-questionnaire-translations.js"></script>
+  <script src="assets/data/deepseek-questionnaire-translations.js"></script>
   <script>
     (function () {
       'use strict'
@@ -625,13 +756,23 @@
       const PAGE_STORAGE_KEY = 'multilingual-page:questionnaire-page'
       const REVIEW_STORAGE_KEY = 'multilingual-page:manual-review:v1'
       const SCREENSHOT_LANGUAGE = 'zh'
-      const pageNames = [
-        '问卷介绍', '设备情况', '性别选择', '主要目标', '锻炼部位',
-        '年龄', '身高', '当前体重', '体重风险提示', '目标体重',
-        '减重计划', '日常活动', '爬楼感受', '运动强度', '运动枯燥度',
-        '目标实现难度', '成功案例', '平台合作', '身体状况总结', '训练计划完成'
-      ]
-      const languageLabels = { zh: '中文', en: '英文', th: '泰语', ms: '马来语' }
+      const baselinePages = (window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
+        ...page,
+        items: page.items.map(item => ({ ...item }))
+      }))
+      const pageNames = baselinePages.map(page => page.label)
+      const languageLabels = {
+        zh: '中文',
+        en: '英文',
+        th: '泰语',
+        ms: '马来语',
+        de: '德语',
+        tr: '土耳其语',
+        fr: '法语',
+        uk: '乌克兰语',
+        'ar-SA': '阿拉伯语（沙特）'
+      }
+      const languageCodes = { zh: 'zh-CN', en: 'en', th: 'th', ms: 'ms', de: 'de', tr: 'tr', fr: 'fr', uk: 'uk', 'ar-SA': 'ar-SA' }
       const languageButtons = Array.from(document.querySelectorAll('.language-button'))
       const elements = {
         pageKicker: document.querySelector('#pageKicker'),
@@ -645,6 +786,12 @@
         chineseTextTitle: document.querySelector('#chineseTextTitle'),
         chineseTextCount: document.querySelector('#chineseTextCount'),
         chineseTextList: document.querySelector('#chineseTextList'),
+        aiLanguageBadge: document.querySelector('#aiLanguageBadge'),
+        aiTranslationKicker: document.querySelector('#aiTranslationKicker'),
+        aiTranslationPageTitle: document.querySelector('#aiTranslationPageTitle'),
+        aiTranslationSummary: document.querySelector('#aiTranslationSummary'),
+        aiTranslationCount: document.querySelector('#aiTranslationCount'),
+        aiTranslationList: document.querySelector('#aiTranslationList'),
         reviewTextKicker: document.querySelector('#reviewTextKicker'),
         reviewTextTitle: document.querySelector('#reviewTextTitle'),
         reviewTextCount: document.querySelector('#reviewTextCount'),
@@ -656,10 +803,6 @@
         status: document.querySelector('#selectionStatus')
       }
 
-      const baselinePages = (window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
-        ...page,
-        items: page.items.map(item => ({ ...item }))
-      }))
       const reviewDrafts = new Map()
       let savedReviews = readSavedReviews()
 
@@ -757,6 +900,7 @@
         elements.image.alt = `${screenshotLanguageLabel}问卷第 ${pageNumber} 页：${pageName}`
         elements.image.src = imagePath(SCREENSHOT_LANGUAGE, currentPage)
         renderChineseTexts(currentPage)
+        renderAiTranslations(currentPage)
         renderManualReview(currentPage)
 
         preloadAdjacentImage(currentPage - 1)
@@ -806,6 +950,123 @@
       function resizeTextarea (textarea) {
         textarea.style.height = 'auto'
         textarea.style.height = `${Math.max(48, textarea.scrollHeight)}px`
+      }
+
+      function createTranslationArrow () {
+        const arrow = document.createElement('div')
+        arrow.className = 'translation-arrow'
+        arrow.setAttribute('aria-hidden', 'true')
+        arrow.textContent = '↓'
+        return arrow
+      }
+
+      function createTranslationBlock ({ className = '', label, status, statusClass = '', text, lang }) {
+        const block = document.createElement('div')
+        block.className = `translation-block${className ? ` ${className}` : ''}`
+        const labelRow = document.createElement('div')
+        labelRow.className = 'translation-label-row'
+        const blockLabel = document.createElement('span')
+        blockLabel.className = 'translation-label'
+        blockLabel.textContent = label
+        labelRow.append(blockLabel)
+        if (status) {
+          const statusBadge = document.createElement('span')
+          statusBadge.className = `translation-status-badge${statusClass ? ` ${statusClass}` : ''}`
+          statusBadge.textContent = status
+          labelRow.append(statusBadge)
+        }
+        const value = document.createElement('p')
+        value.className = 'translation-value'
+        value.lang = lang
+        value.dir = 'auto'
+        value.textContent = text
+        block.append(labelRow, value)
+        return block
+      }
+
+      function renderAiTranslations (pageIndex) {
+        const page = baselinePages[pageIndex]
+        const paddedNumber = String(pageIndex + 1).padStart(2, '0')
+        const targetLanguage = languageLabels[currentLanguage]
+        const isExternalLanguage = currentLanguage !== 'zh'
+        const codexLabel = isExternalLanguage ? `Codex ${targetLanguage}` : 'Codex 中文校对'
+        const codexDictionary = window.AI_TRANSLATIONS?.[currentLanguage] ?? {}
+        const hasCodexLocale = !isExternalLanguage || Object.keys(codexDictionary).length > 0
+        const deepSeekData = window.DEEPSEEK_TRANSLATIONS ?? {}
+        const deepSeekDictionary = deepSeekData.translations?.[currentLanguage] ?? {}
+        const deepSeekModel = deepSeekData.metadata?.model ?? 'deepseek-chat'
+
+        elements.aiLanguageBadge.textContent = isExternalLanguage
+          ? (hasCodexLocale ? '双模型' : 'DeepSeek')
+          : '中文校对'
+        elements.aiLanguageBadge.title = isExternalLanguage
+          ? `${hasCodexLocale ? 'Codex 与 DeepSeek 对照' : 'Codex 译文待补充，当前展示 DeepSeek 结果'}；DeepSeek 模型：${deepSeekModel}`
+          : '中文基准与 Codex 中文校对对照'
+        elements.aiTranslationKicker.textContent = `问卷页面 ${paddedNumber}`
+        elements.aiTranslationPageTitle.textContent = page?.label ?? pageNames[pageIndex]
+        elements.aiTranslationSummary.textContent = isExternalLanguage
+          ? `中文原文 → ${hasCodexLocale ? 'Codex / ' : 'Codex（待补充）/ '}DeepSeek ${targetLanguage}`
+          : '中文原文 → Codex 中文校对'
+        elements.aiTranslationList.replaceChildren()
+
+        if (!page || page.items.length === 0) {
+          elements.aiTranslationCount.textContent = '0 条'
+          const empty = document.createElement('li')
+          empty.className = 'text-empty'
+          empty.textContent = '该页面暂时没有可翻译的内容。'
+          elements.aiTranslationList.append(empty)
+          return
+        }
+
+        elements.aiTranslationCount.textContent = `${page.items.length} 条`
+        page.items.forEach((item, index) => {
+          const hasCodexTranslation = !isExternalLanguage || item.dynamic || typeof codexDictionary[item.text] === 'string'
+          const codexTranslation = !isExternalLanguage || item.dynamic
+            ? item.text
+            : codexDictionary[item.text]
+          const deepSeekTranslation = item.dynamic ? item.text : deepSeekDictionary[item.text]
+
+          const row = document.createElement('li')
+          row.className = 'ai-translation-item'
+
+          const number = document.createElement('span')
+          number.className = 'text-index'
+          number.textContent = String(index + 1).padStart(2, '0')
+
+          const pair = document.createElement('div')
+          pair.className = 'translation-pair'
+
+          pair.append(
+            createTranslationBlock({ label: '中文原文', text: item.text, lang: 'zh-CN' }),
+            createTranslationArrow(),
+            createTranslationBlock({
+              className: 'is-target',
+              label: codexLabel,
+              status: item.dynamic ? '动态内容 · 原样保留' : (hasCodexTranslation ? '已校对' : '待补充'),
+              statusClass: item.dynamic ? 'is-dynamic' : (hasCodexTranslation ? '' : 'is-missing'),
+              text: hasCodexTranslation ? codexTranslation : '尚未生成 Codex 译文。',
+              lang: languageCodes[currentLanguage]
+            })
+          )
+
+          if (isExternalLanguage) {
+            const hasDeepSeekTranslation = item.dynamic || typeof deepSeekTranslation === 'string'
+            pair.append(
+              createTranslationArrow(),
+              createTranslationBlock({
+                className: 'is-deepseek',
+                label: `DeepSeek ${targetLanguage}`,
+                status: item.dynamic ? '动态内容 · 原样保留' : (hasDeepSeekTranslation ? '模型生成' : '待生成'),
+                statusClass: item.dynamic ? 'is-dynamic' : (hasDeepSeekTranslation ? 'is-model' : 'is-missing'),
+                text: hasDeepSeekTranslation ? deepSeekTranslation : '尚未生成，请运行 DeepSeek 翻译命令。',
+                lang: languageCodes[currentLanguage]
+              })
+            )
+          }
+
+          row.append(number, pair)
+          elements.aiTranslationList.append(row)
+        })
       }
 
       function updateReviewState (page, message) {
@@ -957,13 +1218,14 @@
         const hasDrafts = reviewDrafts.size > 0
         elements.reviewStatus.textContent = hasDrafts
           ? `已导出 ${fileName}；包含 ${savedPageCount} 个已保存页面，未保存修改不会写入文件`
-          : `已导出 ${fileName}；完整保留 20 页结构，其中 ${savedPageCount} 页包含修改`
+          : `已导出 ${fileName}；完整保留 ${baselinePages.length} 页结构，其中 ${savedPageCount} 页包含修改`
       }
 
       function selectLanguage (language, announce) {
         currentLanguage = language
         writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
         renderLanguage()
+        renderAiTranslations(currentPage)
 
         if (announce) {
           document.dispatchEvent(new CustomEvent('languagechange', {
