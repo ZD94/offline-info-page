@@ -537,6 +537,17 @@
       line-height: 1.55;
     }
 
+    .review-textarea.is-imported-modified {
+      border: 2px solid #ef4444;
+      background: #fff7f7;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, .08);
+    }
+
+    .review-textarea.is-imported-modified:focus {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, .18);
+    }
+
     .review-item-meta {
       grid-column: 2;
       display: flex;
@@ -732,7 +743,7 @@
         </div>
       </div>
       <div class="content-summary">
-        <span>修改并保存当前页面的中文文案</span>
+        <span>基于导入的人工核对稿继续修改并保存</span>
         <span id="reviewTextCount" class="text-count">0 条</span>
       </div>
       <ol id="reviewTextList" class="review-text-list"></ol>
@@ -742,28 +753,34 @@
         <button id="exportReviewedTexts" class="action-button export" type="button">导出修改后的文案</button>
       </div>
       <p class="export-hint">导出文件会保存到浏览器下载目录，不会自动覆盖项目中的原始数据文件。</p>
-      <p id="reviewStatus" class="review-status" role="status" aria-live="polite">当前页与中文基准一致</p>
+      <p id="reviewStatus" class="review-status" role="status" aria-live="polite">已加载人工核对初始稿</p>
     </section>
   </main>
 
   <p id="selectionStatus" class="selection-status" role="status" aria-live="polite">当前目标语言：中文；截图固定为中文，第 1 页，问卷介绍</p>
 
-  <script src="assets/data/zh-questionnaire-text.js?v=20261105-22"></script>
-  <script src="assets/data/ai-questionnaire-translations.js?v=20261105-22"></script>
-  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261105-22"></script>
+  <script src="assets/data/zh-questionnaire-text.js?v=20261105-24"></script>
+  <script src="assets/data/review-questionnaire-text.js?v=20261105-24"></script>
+  <script src="assets/data/ai-questionnaire-translations.js?v=20261105-24"></script>
+  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261105-24"></script>
   <script>
     (function () {
       'use strict'
 
       const LANGUAGE_STORAGE_KEY = 'multilingual-page:language'
       const PAGE_STORAGE_KEY = 'multilingual-page:questionnaire-page'
-      const REVIEW_STORAGE_KEY = 'multilingual-page:manual-review:v1'
+      const REVIEW_STORAGE_KEY = 'multilingual-page:manual-review:v2'
       const SCREENSHOT_LANGUAGE = 'zh'
-      const ASSET_VERSION = '20261105-22'
+      const ASSET_VERSION = '20261105-24'
       const baselinePages = (window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
         ...page,
         items: page.items.map(item => ({ ...item }))
       }))
+      const reviewPages = (window.REVIEW_QUESTIONNAIRE_TEXTS ?? window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
+        ...page,
+        items: page.items.map(item => ({ ...item }))
+      }))
+      const reviewPagesByName = new Map(reviewPages.map(page => [page.name, page]))
       const pageNames = baselinePages.map(page => page.label)
       const languageLabels = {
         zh: '中文',
@@ -852,6 +869,11 @@
 
       function arraysEqual (left, right) {
         return left.length === right.length && left.every((value, index) => value === right[index])
+      }
+
+      function reviewPageForIndex (pageIndex) {
+        const baselinePage = baselinePages[pageIndex]
+        return baselinePage ? reviewPagesByName.get(baselinePage.name) : undefined
       }
 
       function savedPageValues (page) {
@@ -1082,7 +1104,7 @@
         if (message) elements.reviewStatus.textContent = message
         else if (hasDraft) elements.reviewStatus.textContent = '当前页有未保存修改'
         else if (hasSavedChanges) elements.reviewStatus.textContent = '当前页修改已保存到本浏览器'
-        else elements.reviewStatus.textContent = '当前页与中文基准一致'
+        else elements.reviewStatus.textContent = '当前页使用人工核对初始稿'
       }
 
       function updateReviewDraft (page) {
@@ -1094,7 +1116,7 @@
       }
 
       function renderManualReview (pageIndex) {
-        const page = baselinePages[pageIndex]
+        const page = reviewPageForIndex(pageIndex)
         const paddedNumber = String(pageIndex + 1).padStart(2, '0')
         elements.reviewTextKicker.textContent = `问卷页面 ${paddedNumber}`
         elements.reviewTextTitle.textContent = page?.label ?? pageNames[pageIndex]
@@ -1124,6 +1146,10 @@
 
           const textarea = document.createElement('textarea')
           textarea.className = 'review-textarea'
+          if (item.modified === true) {
+            textarea.classList.add('is-imported-modified')
+            textarea.title = '该文案在导入的人工核对稿中已修改'
+          }
           textarea.rows = 1
           textarea.value = values[index]
           textarea.setAttribute('aria-label', `第 ${index + 1} 条中文文案`)
@@ -1149,7 +1175,7 @@
       }
 
       function saveCurrentReview () {
-        const page = baselinePages[currentPage]
+        const page = reviewPageForIndex(currentPage)
         if (!page) return
         const values = Array.from(elements.reviewTextList.querySelectorAll('.review-textarea'), textarea => textarea.value)
         const changes = {}
@@ -1167,27 +1193,28 @@
       }
 
       function resetCurrentReview () {
-        const page = baselinePages[currentPage]
+        const page = reviewPageForIndex(currentPage)
         if (!page) return
         delete savedReviews[page.name]
         reviewDrafts.delete(page.name)
         const persisted = persistSavedReviews()
         renderManualReview(currentPage)
-        updateReviewState(page, persisted ? '当前页已重置为中文基准' : '当前页已在本次打开期间重置')
+        updateReviewState(page, persisted ? '当前页已重置为人工核对初始稿' : '当前页已在本次打开期间重置')
       }
 
       function createReviewedExport () {
-        return baselinePages.map(page => {
+        return reviewPages.map(page => {
           const saved = savedReviews[page.name] ?? {}
           return {
             ...page,
             items: page.items.map(item => {
               const reviewedText = typeof saved[item.key] === 'string' ? saved[item.key] : item.text
+              const originalText = typeof item.originalText === 'string' ? item.originalText : item.text
               return {
                 ...item,
                 text: reviewedText,
-                modified: reviewedText !== item.text,
-                originalText: item.text
+                modified: reviewedText !== originalText,
+                originalText
               }
             })
           }
@@ -1210,7 +1237,7 @@
           String(now.getMinutes()).padStart(2, '0'),
           String(now.getSeconds()).padStart(2, '0')
         ].join('')
-        const savedPageCount = baselinePages.filter(page => pageHasSavedChanges(page)).length
+        const savedPageCount = reviewPages.filter(page => pageHasSavedChanges(page)).length
         const fileName = `zh-questionnaire-text.reviewed-${savedPageCount}pages-${timestamp}.js`
         link.href = url
         link.download = fileName
@@ -1222,7 +1249,7 @@
         const hasDrafts = reviewDrafts.size > 0
         elements.reviewStatus.textContent = hasDrafts
           ? `已导出 ${fileName}；包含 ${savedPageCount} 个已保存页面，未保存修改不会写入文件`
-          : `已导出 ${fileName}；完整保留 ${baselinePages.length} 页结构，其中 ${savedPageCount} 页包含修改`
+          : `已导出 ${fileName}；完整保留 ${reviewPages.length} 页人工核对稿结构，其中 ${savedPageCount} 页包含本次保存的修改`
       }
 
       function selectLanguage (language, announce) {

@@ -66,9 +66,11 @@ offline-web-mvp/assets/data/deepseek-questionnaire-translations.js
 
 ## 人工核对
 
+- 人工核对的初始内容来自 `assets/data/review-questionnaire-text.js`，不会再直接复制“中文基准”栏的内容。
+- “中文基准”与 AI 翻译仍使用 `assets/data/zh-questionnaire-text.js`，两套数据相互独立。
 - `保存当前页`：只保存当前问卷页的修改，数据保存在当前浏览器的 `localStorage`。
-- `重置当前页`：只删除当前问卷页的人工修改，其他页面已保存的修改不受影响。
-- `导出修改后的文案`：导出全部 22 页，其中已保存页面使用人工修改，其余页面保留中文基准。
+- `重置当前页`：只将当前页恢复到导入的人工核对初始稿，其他页面已保存的修改不受影响。
+- `导出修改后的文案`：导出全部 22 页，其中已保存页面使用人工修改，其余页面保留人工核对初始稿。
 - 未点击“保存当前页”的修改不会进入导出文件。
 
 每次导出使用唯一文件名，例如：
@@ -83,7 +85,7 @@ zh-questionnaire-text.reviewed-2pages-20261104-181745.js
 window.QUESTIONNAIRE_TEXTS = [/* 22 页完整数据 */]
 ```
 
-其页面和数组结构与 `assets/data/zh-questionnaire-text.js` 一致，每条文案会额外包含两个审核字段：
+其页面和数组结构与 `assets/data/review-questionnaire-text.js` 一致，每条文案会保留两个审核字段：
 
 ```js
 {
@@ -95,7 +97,7 @@ window.QUESTIONNAIRE_TEXTS = [/* 22 页完整数据 */]
 }
 ```
 
-`modified` 表示最终文案是否与本次中文基准不同；`originalText` 始终保存本次中文基准。新增字段不会影响当前网页读取，可以将导出文件重命名为 `zh-questionnaire-text.js` 后替换原文件。
+`modified` 表示最终文案是否与 `originalText` 不同；`originalText` 始终保留导入人工核对稿中的原始文案。新增字段不会影响当前网页读取，可以在确认后将导出结果用于更新正式文案数据。
 
 浏览器不会直接修改项目目录中的原始文件。外部人员核对完成后，需要把导出文件发送给项目维护者，由维护者替换并提交到 GitHub。
 
