@@ -91,6 +91,7 @@
     .language-button:active { transform: scale(.98); }
 
     .language-button:focus-visible,
+    .variant-button:focus-visible,
     .page-button:focus-visible {
       outline: 3px solid var(--focus);
       outline-offset: 2px;
@@ -167,6 +168,57 @@
       background: var(--surface-soft);
       font-size: 12px;
       font-weight: 800;
+    }
+
+    .variant-selector {
+      padding: 12px 14px 13px;
+      border-bottom: 1px solid var(--border);
+      background: #f8faff;
+    }
+
+    .variant-selector[hidden] { display: none; }
+
+    .variant-selector-label {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .variant-buttons {
+      display: flex;
+      gap: 8px;
+      padding: 1px 1px 5px;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scrollbar-width: thin;
+    }
+
+    .variant-button {
+      flex: 0 0 auto;
+      min-height: 38px;
+      padding: 8px 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: #4c586d;
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 750;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: color .18s ease, background .18s ease, border-color .18s ease;
+    }
+
+    .variant-button:hover:not(.is-selected) {
+      color: var(--text);
+      border-color: #aeb8c8;
+      background: var(--surface-soft);
+    }
+
+    .variant-button.is-selected {
+      color: var(--active-text);
+      border-color: var(--active);
+      background: var(--active);
     }
 
     .image-stage {
@@ -272,6 +324,58 @@
       min-height: 58px;
       padding: 0 0 18px;
       border-bottom: 1px solid var(--border);
+    }
+
+    .review-mode-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      margin: 0;
+    }
+
+    .header-review-mode {
+      position: absolute;
+      top: 50%;
+      right: 24px;
+      transform: translateY(-50%);
+    }
+
+    .review-mode-switch {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-soft);
+    }
+
+    .review-mode-button {
+      min-height: 36px;
+      padding: 8px 13px;
+      border: 0;
+      border-radius: 9px;
+      color: #647086;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+
+    .review-mode-button:hover:not(.is-selected) {
+      color: var(--text);
+      background: #fff;
+    }
+
+    .review-mode-button.is-selected {
+      color: #fff;
+      background: var(--active);
+      box-shadow: 0 4px 10px rgba(25, 40, 60, .16);
+    }
+
+    .review-mode-button:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
     }
 
     .baseline-title {
@@ -627,11 +731,18 @@
       border: 0;
     }
 
+    @media (max-width: 1580px) {
+      .header-inner { justify-content: space-between; gap: 16px; }
+      .header-review-mode { position: static; flex: 0 0 auto; transform: none; }
+    }
+
     @media (max-width: 1360px) {
       .workspace { grid-template-columns: minmax(340px, 430px) minmax(0, 1fr); }
     }
 
     @media (max-width: 860px) {
+      .header-inner { flex-direction: column; align-items: stretch; }
+      .header-review-mode { align-self: flex-end; }
       .workspace { grid-template-columns: 1fr; padding-right: 0; }
       .screenshot-panel { position: static; width: min(100%, 500px); margin: 0; }
       .image-stage { height: min(68vh, 720px); min-height: 460px; }
@@ -644,12 +755,17 @@
       .language-button { min-width: 0; width: 100%; }
       .workspace { width: 100%; margin-top: 0; }
       .screenshot-heading { padding: 17px; }
+      .variant-selector { padding-inline: 12px; }
       .image-stage { height: 62vh; min-height: 400px; padding: 12px; }
       .page-navigation { gap: 8px; padding: 12px; }
       .page-button { padding-inline: 10px; }
       .content-area { margin-inline: 10px; padding: 18px; }
       .content-heading { gap: 10px; }
       .baseline-title { font-size: 25px; }
+      .review-mode-toolbar { justify-content: stretch; }
+      .header-review-mode { width: 100%; }
+      .review-mode-switch { width: 100%; }
+      .review-mode-button { flex: 1; min-width: 0; white-space: normal; }
       .chinese-text-item { grid-template-columns: 34px minmax(0, 1fr); }
       .ai-translation-item { grid-template-columns: 34px minmax(0, 1fr); }
       .review-text-item { grid-template-columns: 34px minmax(0, 1fr); }
@@ -671,6 +787,12 @@
         <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="uk">乌克兰语</button>
         <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="ar-SA">阿拉伯语（沙特）</button>
       </div>
+      <div class="review-mode-toolbar header-review-mode">
+        <div class="review-mode-switch" role="radiogroup" aria-label="选择人工核对模式">
+          <button class="review-mode-button is-selected" type="button" role="radio" aria-checked="true" tabindex="0" data-review-mode="baseline">中文基准核对</button>
+          <button class="review-mode-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-review-mode="translation">多语言译文核对</button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -682,6 +804,11 @@
           <h1 id="pageTitle" class="page-title">问卷介绍</h1>
         </div>
         <span id="languageLabel" class="language-label">中文</span>
+      </div>
+
+      <div id="variantSelector" class="variant-selector" hidden>
+        <p id="variantSelectorLabel" class="variant-selector-label">当前页面子项</p>
+        <div id="variantButtons" class="variant-buttons" role="radiogroup" aria-labelledby="variantSelectorLabel"></div>
       </div>
 
       <div id="imageStage" class="image-stage">
@@ -759,19 +886,22 @@
 
   <p id="selectionStatus" class="selection-status" role="status" aria-live="polite">当前目标语言：中文；截图固定为中文，第 1 页，问卷介绍</p>
 
-  <script src="assets/data/zh-questionnaire-text.js?v=20261105-24"></script>
-  <script src="assets/data/review-questionnaire-text.js?v=20261105-24"></script>
-  <script src="assets/data/ai-questionnaire-translations.js?v=20261105-24"></script>
-  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261105-24"></script>
+  <script src="assets/data/zh-questionnaire-text.js?v=20261106-26"></script>
+  <script src="assets/data/review-questionnaire-text.js?v=20261106-26"></script>
+  <script src="assets/data/pre-questionnaire-text.js?v=20261106-26"></script>
+  <script src="assets/data/post-questionnaire-text.js?v=20261106-26"></script>
+  <script src="assets/data/zh-questionnaire-variants.js?v=20261106-26"></script>
+  <script src="assets/data/ai-questionnaire-translations.js?v=20261106-26"></script>
+  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261106-26"></script>
   <script>
     (function () {
       'use strict'
 
       const LANGUAGE_STORAGE_KEY = 'multilingual-page:language'
-      const PAGE_STORAGE_KEY = 'multilingual-page:questionnaire-page'
+      const PAGE_STORAGE_KEY = 'multilingual-page:questionnaire-page:v2'
       const REVIEW_STORAGE_KEY = 'multilingual-page:manual-review:v2'
       const SCREENSHOT_LANGUAGE = 'zh'
-      const ASSET_VERSION = '20261105-24'
+      const ASSET_VERSION = '20261106-26'
       const baselinePages = (window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
         ...page,
         items: page.items.map(item => ({ ...item }))
@@ -795,11 +925,15 @@
       }
       const languageCodes = { zh: 'zh-CN', en: 'en', th: 'th', ms: 'ms', de: 'de', tr: 'tr', fr: 'fr', uk: 'uk', 'ar-SA': 'ar-SA' }
       const languageButtons = Array.from(document.querySelectorAll('.language-button'))
+      const reviewModeButtons = Array.from(document.querySelectorAll('.review-mode-button'))
+      let currentReviewMode = 'baseline'
       const elements = {
         pageKicker: document.querySelector('#pageKicker'),
         pageTitle: document.querySelector('#pageTitle'),
         languageLabel: document.querySelector('#languageLabel'),
         image: document.querySelector('#questionnaireImage'),
+        variantSelector: document.querySelector('#variantSelector'),
+        variantButtons: document.querySelector('#variantButtons'),
         previous: document.querySelector('#previousPage'),
         next: document.querySelector('#nextPage'),
         counter: document.querySelector('#pageCounter'),
@@ -829,6 +963,7 @@
 
       let currentLanguage = readStorage(LANGUAGE_STORAGE_KEY, 'zh')
       let currentPage = Number(readStorage(PAGE_STORAGE_KEY, '0'))
+      let currentVariantId = null
       if (!Object.hasOwn(languageLabels, currentLanguage)) currentLanguage = 'zh'
       if (!Number.isInteger(currentPage) || currentPage < 0 || currentPage >= pageNames.length) currentPage = 0
 
@@ -876,6 +1011,30 @@
         return baselinePage ? reviewPagesByName.get(baselinePage.name) : undefined
       }
 
+      function reviewTargetForIndex (pageIndex) {
+        const variant = activeVariantForPage(pageIndex)
+        if (!variant) return reviewPageForIndex(pageIndex)
+
+        const baselinePage = baselinePages[pageIndex]
+        const variants = variantsForPage(pageIndex)
+        const index = variants.indexOf(variant)
+        const id = variantId(variant, index)
+        return {
+          order: pageIndex + 1,
+          name: `${baselinePage.name}::${id}`,
+          label: `${baselinePage.label} · ${variant.label || `子项 ${index + 1}`}`,
+          screenshot: variant.screenshot,
+          isVariant: true,
+          items: Array.isArray(variant.items)
+            ? variant.items.map(item => ({
+                ...item,
+                modified: false,
+                originalText: item.text
+              }))
+            : []
+        }
+      }
+
       function savedPageValues (page) {
         const saved = savedReviews[page.name] ?? {}
         return page.items.map(item => typeof saved[item.key] === 'string' ? saved[item.key] : item.text)
@@ -889,12 +1048,127 @@
         return !arraysEqual(savedPageValues(page), page.items.map(item => item.text))
       }
 
+      function versionedAssetPath (assetPath) {
+        return `${assetPath}${assetPath.includes('?') ? '&' : '?'}v=${ASSET_VERSION}`
+      }
+
       function imagePath (language, pageIndex) {
-        return `assets/screenshots/${language}/${String(pageIndex + 1).padStart(2, '0')}.png?v=${ASSET_VERSION}`
+        return versionedAssetPath(`assets/screenshots/${language}/${String(pageIndex + 1).padStart(2, '0')}.png`)
+      }
+
+      function variantsForPage (pageIndex) {
+        const page = baselinePages[pageIndex]
+        if (!page) return []
+        const entry = window.QUESTIONNAIRE_VARIANTS?.[page.name]
+        const variants = Array.isArray(entry) ? entry : entry?.variants
+        return Array.isArray(variants) ? variants.filter(variant => variant && typeof variant === 'object') : []
+      }
+
+      function variantId (variant, index) {
+        return String(variant.id ?? `variant-${String(index + 1).padStart(2, '0')}`)
+      }
+
+      function activeVariantForPage (pageIndex) {
+        if (currentVariantId === null) return undefined
+        return variantsForPage(pageIndex).find((variant, index) => variantId(variant, index) === currentVariantId)
+      }
+
+      function variantImagePath (pageIndex, variant) {
+        const page = baselinePages[pageIndex]
+        const screenshot = typeof variant?.screenshot === 'string' ? variant.screenshot.trim().replaceAll('\\', '/') : ''
+        if (!page || !screenshot) return imagePath(SCREENSHOT_LANGUAGE, pageIndex)
+
+        let assetPath = screenshot
+        if (!/^(?:assets\/|\/|https?:\/\/|data:)/.test(assetPath)) {
+          assetPath = assetPath.includes('/')
+            ? `assets/screenshots/${SCREENSHOT_LANGUAGE}/${assetPath}`
+            : `assets/screenshots/${SCREENSHOT_LANGUAGE}/variants/${page.name}/${assetPath}`
+        }
+        const version = typeof variant.contentHash === 'string' && variant.contentHash
+          ? variant.contentHash.slice(0, 16)
+          : ASSET_VERSION
+        return `${assetPath}${assetPath.includes('?') ? '&' : '?'}v=${version}`
+      }
+
+      function syncVariantButtons () {
+        Array.from(elements.variantButtons.querySelectorAll('.variant-button')).forEach(button => {
+          const selected = (button.dataset.variantId || null) === currentVariantId
+          button.classList.toggle('is-selected', selected)
+          button.setAttribute('aria-checked', String(selected))
+          button.tabIndex = selected ? 0 : -1
+        })
+      }
+
+      function selectVariant (id) {
+        const variants = variantsForPage(currentPage)
+        const exists = id === null || variants.some((variant, index) => variantId(variant, index) === id)
+        if (!exists || id === currentVariantId) return
+
+        currentVariantId = id
+        syncVariantButtons()
+        renderCurrentScreenshot()
+        renderChineseTexts(currentPage)
+        renderManualReview(currentPage)
+        updateSelectionStatus()
+      }
+
+      function renderVariantSelector () {
+        const variants = variantsForPage(currentPage)
+        elements.variantButtons.replaceChildren()
+        elements.variantSelector.hidden = variants.length === 0
+        if (variants.length === 0) {
+          currentVariantId = null
+          return
+        }
+
+        const options = [
+          { id: null, label: '主页面' },
+          ...variants.map((variant, index) => ({ id: variantId(variant, index), label: variant.label || `子项 ${index + 1}` }))
+        ]
+
+        options.forEach((option, index) => {
+          const button = document.createElement('button')
+          button.type = 'button'
+          button.className = 'variant-button'
+          button.dataset.variantId = option.id ?? ''
+          button.setAttribute('role', 'radio')
+          button.textContent = option.label
+          button.addEventListener('click', function () { selectVariant(option.id) })
+          button.addEventListener('keydown', function (event) {
+            let nextIndex = index
+            if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (index + 1) % options.length
+            else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') nextIndex = (index - 1 + options.length) % options.length
+            else if (event.key === 'Home') nextIndex = 0
+            else if (event.key === 'End') nextIndex = options.length - 1
+            else return
+
+            event.preventDefault()
+            selectVariant(options[nextIndex].id)
+            elements.variantButtons.querySelectorAll('.variant-button')[nextIndex]?.focus()
+          })
+          elements.variantButtons.append(button)
+        })
+        syncVariantButtons()
+      }
+
+      function renderCurrentScreenshot () {
+        const pageNumber = currentPage + 1
+        const pageName = pageNames[currentPage]
+        const variant = activeVariantForPage(currentPage)
+        const screenshotLanguageLabel = languageLabels[SCREENSHOT_LANGUAGE]
+        const displayName = variant ? `${pageName}，子项：${variant.label}` : pageName
+
+        elements.image.classList.add('is-loading')
+        elements.image.alt = `${screenshotLanguageLabel}问卷第 ${pageNumber} 页：${displayName}`
+        elements.image.src = variant
+          ? variantImagePath(currentPage, variant)
+          : imagePath(SCREENSHOT_LANGUAGE, currentPage)
       }
 
       function updateSelectionStatus () {
-        elements.status.textContent = `当前目标语言：${languageLabels[currentLanguage]}；截图固定为中文，第 ${currentPage + 1} 页，${pageNames[currentPage]}`
+        const variant = activeVariantForPage(currentPage)
+        const variantStatus = variant ? `；当前子项：${variant.label}` : '；当前展示：主页面'
+        elements.status.textContent = `当前目标语言：${languageLabels[currentLanguage]}；截图固定为中文，第 ${currentPage + 1} 页，${pageNames[currentPage]}${variantStatus}`
       }
 
       function renderLanguage () {
@@ -913,7 +1187,6 @@
         const pageNumber = currentPage + 1
         const paddedNumber = String(pageNumber).padStart(2, '0')
         const pageName = pageNames[currentPage]
-        const screenshotLanguageLabel = languageLabels[SCREENSHOT_LANGUAGE]
 
         elements.pageKicker.textContent = `问卷页面 ${paddedNumber}`
         elements.pageTitle.textContent = pageName
@@ -922,9 +1195,8 @@
         elements.next.disabled = currentPage === pageNames.length - 1
         updateSelectionStatus()
 
-        elements.image.classList.add('is-loading')
-        elements.image.alt = `${screenshotLanguageLabel}问卷第 ${pageNumber} 页：${pageName}`
-        elements.image.src = imagePath(SCREENSHOT_LANGUAGE, currentPage)
+        renderVariantSelector()
+        renderCurrentScreenshot()
         renderChineseTexts(currentPage)
         renderAiTranslations(currentPage)
         renderManualReview(currentPage)
@@ -934,13 +1206,17 @@
       }
 
       function renderChineseTexts (pageIndex) {
-        const page = window.QUESTIONNAIRE_TEXTS?.[pageIndex]
+        const baselinePage = window.QUESTIONNAIRE_TEXTS?.[pageIndex]
+        const variant = activeVariantForPage(pageIndex)
+        const page = variant ?? baselinePage
         const paddedNumber = String(pageIndex + 1).padStart(2, '0')
-        elements.chineseTextKicker.textContent = `问卷页面 ${paddedNumber}`
-        elements.chineseTextTitle.textContent = page?.label ?? pageNames[pageIndex]
+        elements.chineseTextKicker.textContent = variant ? `问卷页面 ${paddedNumber} · 子项` : `问卷页面 ${paddedNumber}`
+        elements.chineseTextTitle.textContent = variant
+          ? `${baselinePage?.label ?? pageNames[pageIndex]} · ${variant.label}`
+          : (baselinePage?.label ?? pageNames[pageIndex])
         elements.chineseTextList.replaceChildren()
 
-        if (!page || page.items.length === 0) {
+        if (!page || !Array.isArray(page.items) || page.items.length === 0) {
           elements.chineseTextCount.textContent = '0 条'
           const empty = document.createElement('li')
           empty.className = 'text-empty'
@@ -1011,7 +1287,7 @@
       }
 
       function renderAiTranslations (pageIndex) {
-        const page = baselinePages[pageIndex]
+        const page = window.QUESTIONNAIRE_TEXTS?.[pageIndex]
         const paddedNumber = String(pageIndex + 1).padStart(2, '0')
         const targetLanguage = languageLabels[currentLanguage]
         const isExternalLanguage = currentLanguage !== 'zh'
@@ -1116,9 +1392,11 @@
       }
 
       function renderManualReview (pageIndex) {
-        const page = reviewPageForIndex(pageIndex)
+        const page = reviewTargetForIndex(pageIndex)
         const paddedNumber = String(pageIndex + 1).padStart(2, '0')
-        elements.reviewTextKicker.textContent = `问卷页面 ${paddedNumber}`
+        elements.reviewTextKicker.textContent = page?.isVariant
+          ? `问卷页面 ${paddedNumber} · 子项`
+          : `问卷页面 ${paddedNumber}`
         elements.reviewTextTitle.textContent = page?.label ?? pageNames[pageIndex]
         elements.reviewTextList.replaceChildren()
 
@@ -1175,7 +1453,7 @@
       }
 
       function saveCurrentReview () {
-        const page = reviewPageForIndex(currentPage)
+        const page = reviewTargetForIndex(currentPage)
         if (!page) return
         const values = Array.from(elements.reviewTextList.querySelectorAll('.review-textarea'), textarea => textarea.value)
         const changes = {}
@@ -1193,7 +1471,7 @@
       }
 
       function resetCurrentReview () {
-        const page = reviewPageForIndex(currentPage)
+        const page = reviewTargetForIndex(currentPage)
         if (!page) return
         delete savedReviews[page.name]
         reviewDrafts.delete(page.name)
@@ -1268,6 +1546,7 @@
       function goToPage (pageIndex) {
         if (pageIndex < 0 || pageIndex >= pageNames.length || pageIndex === currentPage) return
         currentPage = pageIndex
+        currentVariantId = null
         writeStorage(PAGE_STORAGE_KEY, currentPage)
         renderPage()
       }
@@ -1276,6 +1555,16 @@
         if (pageIndex < 0 || pageIndex >= pageNames.length) return
         const image = new Image()
         image.src = imagePath(SCREENSHOT_LANGUAGE, pageIndex)
+      }
+
+      function selectReviewMode (mode) {
+        currentReviewMode = mode
+        reviewModeButtons.forEach(function (button) {
+          const selected = button.dataset.reviewMode === currentReviewMode
+          button.classList.toggle('is-selected', selected)
+          button.setAttribute('aria-checked', String(selected))
+          button.tabIndex = selected ? 0 : -1
+        })
       }
 
       languageButtons.forEach((button, index) => {
@@ -1297,6 +1586,25 @@
         })
       })
 
+      reviewModeButtons.forEach(function (button, index) {
+        button.addEventListener('click', function () {
+          selectReviewMode(button.dataset.reviewMode)
+        })
+
+        button.addEventListener('keydown', function (event) {
+          let nextIndex = index
+          if (event.key === 'ArrowRight' || event.key === 'ArrowDown') nextIndex = (index + 1) % reviewModeButtons.length
+          else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') nextIndex = (index - 1 + reviewModeButtons.length) % reviewModeButtons.length
+          else if (event.key === 'Home') nextIndex = 0
+          else if (event.key === 'End') nextIndex = reviewModeButtons.length - 1
+          else return
+
+          event.preventDefault()
+          selectReviewMode(reviewModeButtons[nextIndex].dataset.reviewMode)
+          reviewModeButtons[nextIndex].focus()
+        })
+      })
+
       elements.previous.addEventListener('click', function () { goToPage(currentPage - 1) })
       elements.next.addEventListener('click', function () { goToPage(currentPage + 1) })
       elements.saveReview.addEventListener('click', saveCurrentReview)
@@ -1305,7 +1613,9 @@
       elements.image.addEventListener('load', function () { elements.image.classList.remove('is-loading') })
       elements.image.addEventListener('error', function () {
         elements.image.classList.remove('is-loading')
-        elements.status.textContent = `中文第 ${currentPage + 1} 页截图加载失败`
+        const variant = activeVariantForPage(currentPage)
+        const variantLabel = variant ? `子项“${variant.label}”` : '主页面'
+        elements.status.textContent = `中文第 ${currentPage + 1} 页${variantLabel}截图加载失败`
       })
 
       renderLanguage()
