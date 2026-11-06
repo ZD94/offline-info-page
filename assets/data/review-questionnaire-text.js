@@ -443,7 +443,7 @@ window.REVIEW_QUESTIONNAIRE_TEXTS = [
       },
       {
         "key": "question-body-focus|com.onespax.int.spax:id/scroll_title|text|1",
-        "text": "你想锻炼哪些部位？",
+        "text": "你想通过$锻炼哪些部位？",
         "dynamic": false,
         "modified": true,
         "originalText": "您想锻炼哪个（哪些）部位？"
@@ -691,7 +691,7 @@ window.REVIEW_QUESTIONNAIRE_TEXTS = [
       },
       {
         "key": "question-current-weight|manual|text|10",
-        "text": "让我们用运动搭配你习惯的饮食，一步步靠近理想体重。",
+        "text": "接下来帮你增强体能、雕刻线条，让身材更紧致、更有活力。",
         "dynamic": false,
         "modified": true,
         "originalText": "你的体重处于健康范围。让我们按照适合你的节奏，逐步提升力量和耐力。"
@@ -2890,23 +2890,23 @@ window.REVIEW_QUESTIONNAIRE_TEXTS = [
     "items": [
       {
         "key": "postlude-ios-retention-box|manual|text|1",
-        "text": "Crazy Friday Exclusive Offer Box",
+        "text": "周五狂欢 · 专属宝箱",
         "dynamic": false,
-        "modified": false,
+        "modified": true,
         "originalText": "Crazy Friday Exclusive Offer Box"
       },
       {
         "key": "postlude-ios-retention-box|manual|text|2",
-        "text": "Give it a spin for your reward",
+        "text": "开启宝箱，解锁你的惊喜福利",
         "dynamic": false,
-        "modified": false,
+        "modified": true,
         "originalText": "Give it a spin for your reward"
       },
       {
         "key": "postlude-ios-retention-box|manual|text|3",
-        "text": "Automatic draw in 2 seconds",
+        "text": "2s后自动开启",
         "dynamic": true,
-        "modified": false,
+        "modified": true,
         "originalText": "Automatic draw in 2 seconds"
       }
     ]
@@ -2919,16 +2919,16 @@ window.REVIEW_QUESTIONNAIRE_TEXTS = [
     "items": [
       {
         "key": "postlude-ios-retention-offer|manual|text|1",
-        "text": "Expiring today!",
+        "text": "今日限时失效",
         "dynamic": false,
-        "modified": false,
+        "modified": true,
         "originalText": "Expiring today!"
       },
       {
         "key": "postlude-ios-retention-offer|manual|text|2",
-        "text": "Save up to 75% on Premium",
+        "text": "最高立省75%",
         "dynamic": false,
-        "modified": false,
+        "modified": true,
         "originalText": "Save up to 75% on Premium"
       },
       {
@@ -2940,9 +2940,9 @@ window.REVIEW_QUESTIONNAIRE_TEXTS = [
       },
       {
         "key": "postlude-ios-retention-offer|manual|text|4",
-        "text": "Discount voucher",
+        "text": "优惠券",
         "dynamic": false,
-        "modified": false,
+        "modified": true,
         "originalText": "Discount voucher"
       },
       {
@@ -2961,9 +2961,9 @@ window.REVIEW_QUESTIONNAIRE_TEXTS = [
       },
       {
         "key": "postlude-ios-retention-offer|manual|text|7",
-        "text": "您的专属优惠将在以下时间后失效",
+        "text": "专属优惠倒计时",
         "dynamic": false,
-        "modified": false,
+        "modified": true,
         "originalText": "您的专属优惠将在以下时间后失效"
       },
       {
@@ -2996,16 +2996,16 @@ window.REVIEW_QUESTIONNAIRE_TEXTS = [
       },
       {
         "key": "postlude-ios-retention-offer|manual|text|12",
-        "text": "永久解锁所有内容与更新",
+        "text": "一次付费，终身使用",
         "dynamic": false,
-        "modified": false,
+        "modified": true,
         "originalText": "永久解锁所有内容与更新"
       },
       {
         "key": "postlude-ios-retention-offer|manual|text|13",
-        "text": "立即领取一次性优惠",
+        "text": "立即领取本次优惠",
         "dynamic": false,
-        "modified": false,
+        "modified": true,
         "originalText": "立即领取一次性优惠"
       },
       {
@@ -3025,9 +3025,9 @@ window.REVIEW_QUESTIONNAIRE_TEXTS = [
     "items": [
       {
         "key": "postlude-final-retention|manual|text|1",
-        "text": "最后一次专属优惠！",
+        "text": "今日随机抽选6名！",
         "dynamic": false,
-        "modified": false,
+        "modified": true,
         "originalText": "最后一次专属优惠！"
       },
       {
@@ -3336,16 +3336,16 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
       "items": [
         {
           "key": "question-current-weight::variant-01|manual|text|1",
-          "text": "关于您",
+          "text": "关于你",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "关于您"
         },
         {
           "key": "question-current-weight::variant-01|manual|text|2",
-          "text": "你目前的体重是多少？",
+          "text": "你当前体重是？",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "你目前的体重是多少？"
         },
         {
@@ -3392,9 +3392,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-current-weight::variant-01|manual|text|9",
-          "text": "专注于提升力量，通过营养均衡的饮食为身体补充能量。",
+          "text": "体重偏轻，我们帮你通过力量训练和营养饮食，健康地长出肌肉线条。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "专注于提升力量，通过营养均衡的饮食为身体补充能量。"
         },
         {
@@ -3417,16 +3417,16 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
       "items": [
         {
           "key": "question-current-weight::variant-02|manual|text|1",
-          "text": "关于您",
+          "text": "关于你",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "关于您"
         },
         {
           "key": "question-current-weight::variant-02|manual|text|2",
-          "text": "你目前的体重是多少？",
+          "text": "你当前体重是？",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "你目前的体重是多少？"
         },
         {
@@ -3473,9 +3473,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-current-weight::variant-02|manual|text|9",
-          "text": "通过坚持适合自己的训练和健康饮食习惯，一步步实现你的体重目标。",
+          "text": "坚持规律运动就能看到变化。我们帮你定制一套容易坚持的燃脂方案。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "通过坚持适合自己的训练和健康饮食习惯，一步步实现你的体重目标。"
         },
         {
@@ -3498,16 +3498,16 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
       "items": [
         {
           "key": "question-current-weight::variant-03|manual|text|1",
-          "text": "关于您",
+          "text": "关于你",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "关于您"
         },
         {
           "key": "question-current-weight::variant-03|manual|text|2",
-          "text": "你目前的体重是多少？",
+          "text": "你当前体重是？",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "你目前的体重是多少？"
         },
         {
@@ -3554,9 +3554,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-current-weight::variant-03|manual|text|9",
-          "text": "我们将帮助你从力所能及的训练和均衡饮食开始，一步一步建立健康习惯。",
+          "text": "当前体重对代谢和关节负担可能较大。我们从低冲击运动开始，配合饮食调整，循序渐进。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "我们将帮助你从力所能及的训练和均衡饮食开始，一步一步建立健康习惯。"
         },
         {
@@ -3579,16 +3579,16 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
       "items": [
         {
           "key": "question-current-weight::variant-04|manual|text|1",
-          "text": "关于您",
+          "text": "关于你",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "关于您"
         },
         {
           "key": "question-current-weight::variant-04|manual|text|2",
-          "text": "你目前的体重是多少？",
+          "text": "你当前体重是？",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "你目前的体重是多少？"
         },
         {
@@ -3635,9 +3635,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-current-weight::variant-04|manual|text|9",
-          "text": "先从轻柔的运动和饮食习惯上的小改变开始，再逐步提升。",
+          "text": "从最温和的运动开始，不伤膝盖、不勉强。每一次坚持都算数，我们陪你一步一步来。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "先从轻柔的运动和饮食习惯上的小改变开始，再逐步提升。"
         },
         {
@@ -3683,44 +3683,44 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-bmi-risk::variant-01|manual|text|4",
-          "text": "增肌",
+          "text": "免疫力下降",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "增肌"
         },
         {
           "key": "question-bmi-risk::variant-01|manual|text|5",
-          "text": "为身体补充能量",
+          "text": "骨质疏松风险",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "为身体补充能量"
         },
         {
           "key": "question-bmi-risk::variant-01|manual|text|6",
-          "text": "提升耐力",
+          "text": "贫血/易疲劳",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "提升耐力"
         },
         {
           "key": "question-bmi-risk::variant-01|manual|text|7",
-          "text": "提升体能",
+          "text": "内分泌紊乱",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "提升体能"
         },
         {
           "key": "question-bmi-risk::variant-01|manual|text|8",
-          "text": "增强力量，为进步注入能量。",
+          "text": "体重过轻的人群，发生免疫力低下的风险可能是正常体重者的 3 倍。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "增强力量，为进步注入能量。"
         },
         {
           "key": "question-bmi-risk::variant-01|manual|text|9",
-          "text": "获取为你量身定制的力量训练课程和营养建议。",
+          "text": "偏瘦人群，其实存在肌肉量不足的“隐性虚弱”",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "获取为你量身定制的力量训练课程和营养建议。"
         },
         {
@@ -3757,44 +3757,44 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-bmi-risk::variant-02|manual|text|3",
-          "text": "提升力量",
+          "text": "体能储备不足",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "提升力量"
         },
         {
           "key": "question-bmi-risk::variant-02|manual|text|4",
-          "text": "提升耐力",
+          "text": "内脏脂肪隐患",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "提升耐力"
         },
         {
           "key": "question-bmi-risk::variant-02|manual|text|5",
-          "text": "维护心脏健康",
+          "text": "肌肉流失风险",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "维护心脏健康"
         },
         {
           "key": "question-bmi-risk::variant-02|manual|text|6",
-          "text": "增加日常活动",
+          "text": "久坐体态问题",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "增加日常活动"
         },
         {
           "key": "question-bmi-risk::variant-02|manual|text|7",
-          "text": "让接下来的每一步都更有价值。",
+          "text": "未达到世卫组织（WHO）建议运动量的人群，发生心血管代谢问题的风险，最高可达规律运动人群的 3 倍。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "让接下来的每一步都更有价值。"
         },
         {
           "key": "question-bmi-risk::variant-02|manual|text|8",
-          "text": "获取符合你目标的训练课程和营养建议。",
+          "text": "的“健康体重”人群，其实存在体脂率超标、肌肉量不足的“隐性肥胖”问题。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "获取符合你目标的训练课程和营养建议。"
         },
         {
@@ -3838,16 +3838,16 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-bmi-risk::variant-03|manual|text|4",
-          "text": "心脏疾病\n风险增加 30%",
+          "text": "心脏疾病\n风险增加",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "心脏疾病\n风险增加 30%"
         },
         {
           "key": "question-bmi-risk::variant-03|manual|text|5",
-          "text": "高血压\n风险增加 30%",
+          "text": "高血压\n风险增加",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "高血压\n风险增加 30%"
         },
         {
@@ -3859,9 +3859,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-bmi-risk::variant-03|manual|text|7",
-          "text": "中风\n风险增加 30%",
+          "text": "中风\n风险增加",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "中风\n风险增加 30%"
         },
         {
@@ -3887,9 +3887,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-bmi-risk::variant-03|manual|text|11",
-          "text": "的成年人表示曾因体重而遭受偏见。你并不孤单。",
+          "text": "的成年人表示曾因体重而遭受偏见。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "的成年人表示曾因体重而遭受偏见。你并不孤单。"
         },
         {
@@ -3926,23 +3926,23 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-bmi-risk::variant-04|manual|text|3",
-          "text": "肥胖",
+          "text": "属于肥胖范围",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "肥胖"
         },
         {
           "key": "question-bmi-risk::variant-04|manual|text|4",
-          "text": "心脏疾病\n风险增加 30%",
+          "text": "心脏疾病\n风险增加",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "心脏疾病\n风险增加 30%"
         },
         {
           "key": "question-bmi-risk::variant-04|manual|text|5",
-          "text": "高血压\n风险增加 30%",
+          "text": "高血压\n风险增加",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "高血压\n风险增加 30%"
         },
         {
@@ -3954,9 +3954,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-bmi-risk::variant-04|manual|text|7",
-          "text": "中风\n风险增加 30%",
+          "text": "中风\n风险增加",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "中风\n风险增加 30%"
         },
         {
@@ -3982,9 +3982,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-bmi-risk::variant-04|manual|text|11",
-          "text": "的成年人表示曾因体重而遭受偏见。你并不孤单。",
+          "text": "的成年人表示曾因体重而遭受偏见。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "的成年人表示曾因体重而遭受偏见。你并不孤单。"
         },
         {
@@ -4529,9 +4529,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-target-weight::variant-05|manual|text|13",
-          "text": "减掉大量脂肪可以帮助您告别亚健康状态。",
+          "text": "跨度极大的健康改造，我们分段进行，不追求速度，坚持最重要。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "减掉大量脂肪可以帮助您告别亚健康状态。"
         },
         {
@@ -4651,9 +4651,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-stairs::variant-01|manual|text|2",
-          "text": "爬了几层楼梯后，您感觉如何？",
+          "text": "连续爬几层楼梯后，你感觉如何？",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "爬了几层楼梯后，您感觉如何？"
         },
         {
@@ -4672,9 +4672,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-stairs::variant-01|manual|text|5",
-          "text": "轻松",
+          "text": "很轻松",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "轻松"
         },
         {
@@ -4686,9 +4686,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-stairs::variant-01|manual|text|7",
-          "text": "您的心肺功能状况非常好。请继续保持！",
+          "text": "你的心肺功能状况非常好。可以从中强度开始！",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "您的心肺功能状况非常好。请继续保持！"
         },
         {
@@ -4718,9 +4718,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-stairs::variant-02|manual|text|2",
-          "text": "爬了几层楼梯后，您感觉如何？",
+          "text": "连续爬几层楼梯后，你感觉如何？",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "爬了几层楼梯后，您感觉如何？"
         },
         {
@@ -4746,16 +4746,16 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-stairs::variant-02|manual|text|6",
-          "text": "您只需要再多一点运动就能看到一个健康健美的自己！我们将制定一个清晰的计划来帮助您实现。",
+          "text": "大部分人刚开始都这样。我们先从微微出汗开始，逐步加量。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "您只需要再多一点运动就能看到一个健康健美的自己！我们将制定一个清晰的计划来帮助您实现。"
         },
         {
           "key": "question-stairs::variant-02|manual|text|7",
-          "text": "轻松",
+          "text": "很轻松",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "轻松"
         },
         {
@@ -4785,9 +4785,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-stairs::variant-03|manual|text|2",
-          "text": "爬了几层楼梯后，您感觉如何？",
+          "text": "连续爬几层楼梯后，你感觉如何？",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "爬了几层楼梯后，您感觉如何？"
         },
         {
@@ -4806,9 +4806,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-stairs::variant-03|manual|text|5",
-          "text": "进行一些有氧运动可能非常有帮助。我们将为您挑选一些简单但有益的练习。",
+          "text": "很久没动没关系，从短时间简单难度开始，先养成习惯，相信自己最重要。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "进行一些有氧运动可能非常有帮助。我们将为您挑选一些简单但有益的练习。"
         },
         {
@@ -4820,9 +4820,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-stairs::variant-03|manual|text|7",
-          "text": "轻松",
+          "text": "很轻松",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "轻松"
         },
         {
@@ -4854,16 +4854,16 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-intensity::variant-01|manual|text|2",
-          "text": "选择您偏好的运动强度",
+          "text": "你喜欢哪种运动强度？",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "选择您偏好的运动强度"
         },
         {
           "key": "question-intensity::variant-01|manual|text|3",
-          "text": "足够轻松",
+          "text": "轻松，微微出汗",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "足够轻松"
         },
         {
@@ -4875,23 +4875,23 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-intensity::variant-01|manual|text|5",
-          "text": "我们将为您量身打造训练计划，并每日追踪您的进度！",
+          "text": "不追求暴汗，坚持比练得狠更重要。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "我们将为您量身打造训练计划，并每日追踪您的进度！"
         },
         {
           "key": "question-intensity::variant-01|manual|text|6",
-          "text": "简单但会出点汗",
+          "text": "有点累，能坚持",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "简单但会出点汗"
         },
         {
           "key": "question-intensity::variant-01|manual|text|7",
-          "text": "有些挑战性",
+          "text": "高强度，有挑战性",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "有些挑战性"
         },
         {
@@ -4921,23 +4921,23 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-intensity::variant-02|manual|text|2",
-          "text": "选择您偏好的运动强度",
+          "text": "你喜欢哪种运动强度？",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "选择您偏好的运动强度"
         },
         {
           "key": "question-intensity::variant-02|manual|text|3",
-          "text": "足够轻松",
+          "text": "轻松，微微出汗",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "足够轻松"
         },
         {
           "key": "question-intensity::variant-02|manual|text|4",
-          "text": "简单但会出点汗",
+          "text": "有点累，能坚持",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "简单但会出点汗"
         },
         {
@@ -4949,16 +4949,16 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-intensity::variant-02|manual|text|6",
-          "text": "我们有清晰的计划，逐步助您接近目标。",
+          "text": "我会制定清晰的计划，逐步帮你接近目标。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "我们有清晰的计划，逐步助您接近目标。"
         },
         {
           "key": "question-intensity::variant-02|manual|text|7",
-          "text": "有些挑战性",
+          "text": "高强度，有挑战性",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "有些挑战性"
         },
         {
@@ -4988,44 +4988,44 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
         },
         {
           "key": "question-intensity::variant-03|manual|text|2",
-          "text": "选择您偏好的运动强度",
+          "text": "你喜欢哪种运动强度？",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "选择您偏好的运动强度"
         },
         {
           "key": "question-intensity::variant-03|manual|text|3",
-          "text": "足够轻松",
+          "text": "轻松，微微出汗",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "足够轻松"
         },
         {
           "key": "question-intensity::variant-03|manual|text|4",
-          "text": "简单但会出点汗",
+          "text": "有点累，能坚持",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "简单但会出点汗"
         },
         {
           "key": "question-intensity::variant-03|manual|text|5",
-          "text": "有些挑战性",
+          "text": "高强度，有挑战性",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "有些挑战性"
         },
         {
           "key": "question-intensity::variant-03|manual|text|6",
-          "text": "您充满热情!",
+          "text": "你充满热情!",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "您充满热情!"
         },
         {
           "key": "question-intensity::variant-03|manual|text|7",
-          "text": "我们提供一系列具有挑战性但可实现的项目来增强您的体能。",
+          "text": "我会找一系列具有挑战性但可实现的项目来增强你的体能。",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "我们提供一系列具有挑战性但可实现的项目来增强您的体能。"
         },
         {
@@ -5050,9 +5050,9 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
       "items": [
         {
           "key": "question-plan-ready::variant-01|manual|text|1",
-          "text": "训练旅程阶段",
+          "text": "训练阶段",
           "dynamic": false,
-          "modified": false,
+          "modified": true,
           "originalText": "训练旅程阶段"
         },
         {
@@ -5280,4 +5280,3 @@ window.REVIEW_QUESTIONNAIRE_VARIANTS = {
     }
   ]
 }
-
