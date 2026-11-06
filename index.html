@@ -21,6 +21,7 @@
       --active: #1f2937;
       --active-text: #ffffff;
       --focus: #8bb8ff;
+      --page-header-height: 98px;
       font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
     }
 
@@ -125,8 +126,12 @@
 
     .screenshot-panel {
       position: sticky;
-      top: 98px;
+      top: var(--page-header-height);
+      display: flex;
+      flex-direction: column;
       align-self: start;
+      height: calc(100vh - var(--page-header-height) - 14px);
+      height: calc(100dvh - var(--page-header-height) - 14px);
       overflow: hidden;
       border: 1px solid var(--border);
       border-left: 0;
@@ -223,11 +228,12 @@
 
     .image-stage {
       display: flex;
+      flex: 1 1 auto;
       align-items: center;
       justify-content: center;
-      min-height: 360px;
-      height: calc(100vh - 285px);
-      max-height: 780px;
+      min-height: 0;
+      height: auto;
+      max-height: none;
       padding: 12px;
       overflow: hidden;
       background:
@@ -252,6 +258,7 @@
 
     .page-navigation {
       display: grid;
+      flex: 0 0 auto;
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
       gap: 12px;
@@ -744,8 +751,8 @@
       .header-inner { flex-direction: column; align-items: stretch; }
       .header-review-mode { align-self: flex-end; }
       .workspace { grid-template-columns: 1fr; padding-right: 0; }
-      .screenshot-panel { position: static; width: min(100%, 500px); margin: 0; }
-      .image-stage { height: min(68vh, 720px); min-height: 460px; }
+      .screenshot-panel { position: static; display: block; width: min(100%, 500px); height: auto; margin: 0; }
+      .image-stage { flex: none; height: min(68vh, 720px); min-height: 460px; max-height: 720px; }
       .content-area { min-height: 420px; margin: 0 12px 20px; padding: 22px; }
     }
 
@@ -879,20 +886,20 @@
         <button id="saveCurrentReview" class="action-button primary" type="button">保存当前页</button>
         <button id="exportReviewedTexts" class="action-button export" type="button">导出修改后的文案</button>
       </div>
-      <p class="export-hint">导出文件会同时包含主页面与动态子项，并保存到浏览器下载目录；不会自动覆盖项目中的原始数据文件。</p>
+      <p class="export-hint">导出文件与 review-questionnaire-text.js 格式一致，会同时包含主页面与动态子项；不会自动覆盖项目中的原始数据文件。</p>
       <p id="reviewStatus" class="review-status" role="status" aria-live="polite">已加载人工核对初始稿</p>
     </section>
   </main>
 
   <p id="selectionStatus" class="selection-status" role="status" aria-live="polite">当前目标语言：中文；截图固定为中文，第 1 页，问卷介绍</p>
 
-  <script src="assets/data/zh-questionnaire-text.js?v=20261106-27"></script>
-  <script src="assets/data/review-questionnaire-text.js?v=20261106-27"></script>
-  <script src="assets/data/pre-questionnaire-text.js?v=20261106-27"></script>
-  <script src="assets/data/post-questionnaire-text.js?v=20261106-27"></script>
-  <script src="assets/data/zh-questionnaire-variants.js?v=20261106-27"></script>
-  <script src="assets/data/ai-questionnaire-translations.js?v=20261106-27"></script>
-  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261106-27"></script>
+  <script src="assets/data/zh-questionnaire-text.js?v=20261106-28"></script>
+  <script src="assets/data/pre-questionnaire-text.js?v=20261106-28"></script>
+  <script src="assets/data/post-questionnaire-text.js?v=20261106-28"></script>
+  <script src="assets/data/zh-questionnaire-variants.js?v=20261106-28"></script>
+  <script src="assets/data/review-questionnaire-text.js?v=20261106-28"></script>
+  <script src="assets/data/ai-questionnaire-translations.js?v=20261106-28"></script>
+  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261106-28"></script>
   <script>
     (function () {
       'use strict'
@@ -901,7 +908,7 @@
       const PAGE_STORAGE_KEY = 'multilingual-page:questionnaire-page:v2'
       const REVIEW_STORAGE_KEY = 'multilingual-page:manual-review:v2'
       const SCREENSHOT_LANGUAGE = 'zh'
-      const ASSET_VERSION = '20261106-27'
+      const ASSET_VERSION = '20261106-28'
       const baselinePages = (window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
         ...page,
         items: page.items.map(item => ({ ...item }))
@@ -928,6 +935,7 @@
       const reviewModeButtons = Array.from(document.querySelectorAll('.review-mode-button'))
       let currentReviewMode = 'baseline'
       const elements = {
+        pageHeader: document.querySelector('.page-header'),
         pageKicker: document.querySelector('#pageKicker'),
         pageTitle: document.querySelector('#pageTitle'),
         languageLabel: document.querySelector('#languageLabel'),
@@ -956,6 +964,19 @@
         exportReviews: document.querySelector('#exportReviewedTexts'),
         reviewStatus: document.querySelector('#reviewStatus'),
         status: document.querySelector('#selectionStatus')
+      }
+
+      function syncStickyLayout () {
+        const height = elements.pageHeader?.getBoundingClientRect().height
+        if (height) document.documentElement.style.setProperty('--page-header-height', `${height}px`)
+      }
+
+      syncStickyLayout()
+      if (typeof ResizeObserver === 'function' && elements.pageHeader) {
+        const headerResizeObserver = new ResizeObserver(syncStickyLayout)
+        headerResizeObserver.observe(elements.pageHeader)
+      } else {
+        window.addEventListener('resize', syncStickyLayout)
       }
 
       const reviewDrafts = new Map()
@@ -1015,14 +1036,15 @@
         const baselinePage = baselinePages[pageIndex]
         if (!baselinePage || !variant) return undefined
         const id = variantId(variant, index)
+        const reviewVariant = reviewVariantForPage(pageIndex, variant, index)
         return {
           order: pageIndex + 1,
           name: `${baselinePage.name}::${id}`,
-          label: `${baselinePage.label} · ${variant.label || `子项 ${index + 1}`}`,
-          screenshot: variant.screenshot,
+          label: `${baselinePage.label} · ${reviewVariant.label || variant.label || `子项 ${index + 1}`}`,
+          screenshot: reviewVariant.screenshot || variant.screenshot,
           isVariant: true,
-          items: Array.isArray(variant.items)
-            ? variant.items.map(item => {
+          items: Array.isArray(reviewVariant.items)
+            ? reviewVariant.items.map(item => {
                 const originalText = typeof item.originalText === 'string' ? item.originalText : item.text
                 return {
                   ...item,
@@ -1069,6 +1091,19 @@
         const entry = window.QUESTIONNAIRE_VARIANTS?.[page.name]
         const variants = Array.isArray(entry) ? entry : entry?.variants
         return Array.isArray(variants) ? variants.filter(variant => variant && typeof variant === 'object') : []
+      }
+
+      function reviewVariantsForPage (pageIndex) {
+        const page = baselinePages[pageIndex]
+        if (!page) return []
+        const entry = window.REVIEW_QUESTIONNAIRE_VARIANTS?.[page.name]
+        const variants = Array.isArray(entry) ? entry : entry?.variants
+        return Array.isArray(variants) ? variants.filter(variant => variant && typeof variant === 'object') : []
+      }
+
+      function reviewVariantForPage (pageIndex, baselineVariant, index) {
+        const id = variantId(baselineVariant, index)
+        return reviewVariantsForPage(pageIndex).find((variant, reviewIndex) => variantId(variant, reviewIndex) === id) ?? baselineVariant
       }
 
       function variantId (variant, index) {
@@ -1514,10 +1549,11 @@
           if (variants.length === 0) return
 
           exportedVariants[page.name] = variants.map((variant, index) => {
+            const reviewVariant = reviewVariantForPage(pageIndex, variant, index)
             const target = reviewTargetForVariant(pageIndex, variant, index)
             const saved = savedReviews[target.name] ?? {}
             return {
-              ...variant,
+              ...reviewVariant,
               items: target.items.map(item => {
                 const reviewedText = typeof saved[item.key] === 'string' ? saved[item.key] : item.text
                 const originalText = typeof item.originalText === 'string' ? item.originalText : item.text
@@ -1539,8 +1575,8 @@
         const exportedPages = createReviewedExport()
         const exportedVariants = createReviewedVariantExport()
         const source = [
-          `window.QUESTIONNAIRE_TEXTS = ${JSON.stringify(exportedPages, null, 2)}`,
-          `window.QUESTIONNAIRE_VARIANTS = ${JSON.stringify(exportedVariants, null, 2)}`,
+          `window.REVIEW_QUESTIONNAIRE_TEXTS = ${JSON.stringify(exportedPages, null, 2)}`,
+          `window.REVIEW_QUESTIONNAIRE_VARIANTS = ${JSON.stringify(exportedVariants, null, 2)}`,
           ''
         ].join('\n\n')
         const blob = new Blob([source], { type: 'text/javascript;charset=utf-8' })
@@ -1564,7 +1600,7 @@
           }).length
         }, 0)
         const exportedVariantCount = Object.values(exportedVariants).reduce((count, variants) => count + variants.length, 0)
-        const fileName = `zh-questionnaire-text.reviewed-${savedPageCount}pages-${savedVariantCount}variants-${timestamp}.js`
+        const fileName = `review-questionnaire-text.reviewed-${savedPageCount}pages-${savedVariantCount}variants-${timestamp}.js`
         link.href = url
         link.download = fileName
         document.body.append(link)

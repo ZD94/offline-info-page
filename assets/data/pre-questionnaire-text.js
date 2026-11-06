@@ -67,26 +67,11 @@
     }
   ]
 
-  const reviewPages = pages.map(page => ({
-    ...page,
-    items: page.items.map(item => ({
-      ...item,
-      modified: false,
-      originalText: item.text
-    }))
-  }))
   const offset = pages.length
   const questionnairePages = Array.isArray(window.QUESTIONNAIRE_TEXTS) ? window.QUESTIONNAIRE_TEXTS : []
-  const existingReviewPages = Array.isArray(window.REVIEW_QUESTIONNAIRE_TEXTS)
-    ? window.REVIEW_QUESTIONNAIRE_TEXTS
-    : questionnairePages
 
   window.QUESTIONNAIRE_TEXTS = [
     ...pages,
     ...questionnairePages.map((page, index) => ({ ...page, order: index + offset + 1 }))
-  ]
-  window.REVIEW_QUESTIONNAIRE_TEXTS = [
-    ...reviewPages,
-    ...existingReviewPages.map((page, index) => ({ ...page, order: index + offset + 1 }))
   ]
 })()

@@ -147,11 +147,5 @@
       }
     })
   }))
-  const reviewPages = pages.map(page => ({
-    ...page,
-    items: page.items.map(item => ({ ...item, modified: false, originalText: item.text }))
-  }))
-
   window.QUESTIONNAIRE_TEXTS = [...(window.QUESTIONNAIRE_TEXTS ?? []), ...pages]
-  window.REVIEW_QUESTIONNAIRE_TEXTS = [...(window.REVIEW_QUESTIONNAIRE_TEXTS ?? []), ...reviewPages]
 })()
