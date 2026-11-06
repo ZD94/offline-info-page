@@ -879,20 +879,20 @@
         <button id="saveCurrentReview" class="action-button primary" type="button">保存当前页</button>
         <button id="exportReviewedTexts" class="action-button export" type="button">导出修改后的文案</button>
       </div>
-      <p class="export-hint">导出文件会保存到浏览器下载目录，不会自动覆盖项目中的原始数据文件。</p>
+      <p class="export-hint">导出文件会同时包含主页面与动态子项，并保存到浏览器下载目录；不会自动覆盖项目中的原始数据文件。</p>
       <p id="reviewStatus" class="review-status" role="status" aria-live="polite">已加载人工核对初始稿</p>
     </section>
   </main>
 
   <p id="selectionStatus" class="selection-status" role="status" aria-live="polite">当前目标语言：中文；截图固定为中文，第 1 页，问卷介绍</p>
 
-  <script src="assets/data/zh-questionnaire-text.js?v=20261106-26"></script>
-  <script src="assets/data/review-questionnaire-text.js?v=20261106-26"></script>
-  <script src="assets/data/pre-questionnaire-text.js?v=20261106-26"></script>
-  <script src="assets/data/post-questionnaire-text.js?v=20261106-26"></script>
-  <script src="assets/data/zh-questionnaire-variants.js?v=20261106-26"></script>
-  <script src="assets/data/ai-questionnaire-translations.js?v=20261106-26"></script>
-  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261106-26"></script>
+  <script src="assets/data/zh-questionnaire-text.js?v=20261106-27"></script>
+  <script src="assets/data/review-questionnaire-text.js?v=20261106-27"></script>
+  <script src="assets/data/pre-questionnaire-text.js?v=20261106-27"></script>
+  <script src="assets/data/post-questionnaire-text.js?v=20261106-27"></script>
+  <script src="assets/data/zh-questionnaire-variants.js?v=20261106-27"></script>
+  <script src="assets/data/ai-questionnaire-translations.js?v=20261106-27"></script>
+  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261106-27"></script>
   <script>
     (function () {
       'use strict'
@@ -901,7 +901,7 @@
       const PAGE_STORAGE_KEY = 'multilingual-page:questionnaire-page:v2'
       const REVIEW_STORAGE_KEY = 'multilingual-page:manual-review:v2'
       const SCREENSHOT_LANGUAGE = 'zh'
-      const ASSET_VERSION = '20261106-26'
+      const ASSET_VERSION = '20261106-27'
       const baselinePages = (window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
         ...page,
         items: page.items.map(item => ({ ...item }))
@@ -1011,13 +1011,9 @@
         return baselinePage ? reviewPagesByName.get(baselinePage.name) : undefined
       }
 
-      function reviewTargetForIndex (pageIndex) {
-        const variant = activeVariantForPage(pageIndex)
-        if (!variant) return reviewPageForIndex(pageIndex)
-
+      function reviewTargetForVariant (pageIndex, variant, index) {
         const baselinePage = baselinePages[pageIndex]
-        const variants = variantsForPage(pageIndex)
-        const index = variants.indexOf(variant)
+        if (!baselinePage || !variant) return undefined
         const id = variantId(variant, index)
         return {
           order: pageIndex + 1,
@@ -1026,13 +1022,24 @@
           screenshot: variant.screenshot,
           isVariant: true,
           items: Array.isArray(variant.items)
-            ? variant.items.map(item => ({
-                ...item,
-                modified: false,
-                originalText: item.text
-              }))
+            ? variant.items.map(item => {
+                const originalText = typeof item.originalText === 'string' ? item.originalText : item.text
+                return {
+                  ...item,
+                  modified: item.text !== originalText,
+                  originalText
+                }
+              })
             : []
         }
+      }
+
+      function reviewTargetForIndex (pageIndex) {
+        const variant = activeVariantForPage(pageIndex)
+        if (!variant) return reviewPageForIndex(pageIndex)
+
+        const variants = variantsForPage(pageIndex)
+        return reviewTargetForVariant(pageIndex, variant, variants.indexOf(variant))
       }
 
       function savedPageValues (page) {
@@ -1499,9 +1506,43 @@
         })
       }
 
+      function createReviewedVariantExport () {
+        const exportedVariants = {}
+
+        baselinePages.forEach((page, pageIndex) => {
+          const variants = variantsForPage(pageIndex)
+          if (variants.length === 0) return
+
+          exportedVariants[page.name] = variants.map((variant, index) => {
+            const target = reviewTargetForVariant(pageIndex, variant, index)
+            const saved = savedReviews[target.name] ?? {}
+            return {
+              ...variant,
+              items: target.items.map(item => {
+                const reviewedText = typeof saved[item.key] === 'string' ? saved[item.key] : item.text
+                const originalText = typeof item.originalText === 'string' ? item.originalText : item.text
+                return {
+                  ...item,
+                  text: reviewedText,
+                  modified: reviewedText !== originalText,
+                  originalText
+                }
+              })
+            }
+          })
+        })
+
+        return exportedVariants
+      }
+
       function exportReviewedTexts () {
         const exportedPages = createReviewedExport()
-        const source = `window.QUESTIONNAIRE_TEXTS = ${JSON.stringify(exportedPages, null, 2)}\n`
+        const exportedVariants = createReviewedVariantExport()
+        const source = [
+          `window.QUESTIONNAIRE_TEXTS = ${JSON.stringify(exportedPages, null, 2)}`,
+          `window.QUESTIONNAIRE_VARIANTS = ${JSON.stringify(exportedVariants, null, 2)}`,
+          ''
+        ].join('\n\n')
         const blob = new Blob([source], { type: 'text/javascript;charset=utf-8' })
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
@@ -1516,7 +1557,14 @@
           String(now.getSeconds()).padStart(2, '0')
         ].join('')
         const savedPageCount = reviewPages.filter(page => pageHasSavedChanges(page)).length
-        const fileName = `zh-questionnaire-text.reviewed-${savedPageCount}pages-${timestamp}.js`
+        const savedVariantCount = baselinePages.reduce((count, page, pageIndex) => {
+          return count + variantsForPage(pageIndex).filter((variant, index) => {
+            const target = reviewTargetForVariant(pageIndex, variant, index)
+            return target && pageHasSavedChanges(target)
+          }).length
+        }, 0)
+        const exportedVariantCount = Object.values(exportedVariants).reduce((count, variants) => count + variants.length, 0)
+        const fileName = `zh-questionnaire-text.reviewed-${savedPageCount}pages-${savedVariantCount}variants-${timestamp}.js`
         link.href = url
         link.download = fileName
         document.body.append(link)
@@ -1526,8 +1574,8 @@
 
         const hasDrafts = reviewDrafts.size > 0
         elements.reviewStatus.textContent = hasDrafts
-          ? `已导出 ${fileName}；包含 ${savedPageCount} 个已保存页面，未保存修改不会写入文件`
-          : `已导出 ${fileName}；完整保留 ${reviewPages.length} 页人工核对稿结构，其中 ${savedPageCount} 页包含本次保存的修改`
+          ? `已导出 ${fileName}；包含 ${savedPageCount} 个已保存主页面和 ${savedVariantCount} 个已保存子项，未保存修改不会写入文件`
+          : `已导出 ${fileName}；完整保留 ${reviewPages.length} 页主页面和 ${exportedVariantCount} 个动态子项，其中 ${savedPageCount} 个主页面、${savedVariantCount} 个子项包含本次保存的修改`
       }
 
       function selectLanguage (language, announce) {
