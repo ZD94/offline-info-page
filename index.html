@@ -1433,6 +1433,14 @@
         updateReviewState(page)
       }
 
+      function syncReviewTextareaModifiedState (textarea, item) {
+        const originalText = typeof item.originalText === 'string' ? item.originalText : item.text
+        const isModified = textarea.value !== originalText
+        textarea.classList.toggle('is-imported-modified', isModified)
+        if (isModified) textarea.title = '该文案相对中文基准已修改'
+        else textarea.removeAttribute('title')
+      }
+
       function renderManualReview (pageIndex) {
         const page = reviewTargetForIndex(pageIndex)
         const paddedNumber = String(pageIndex + 1).padStart(2, '0')
@@ -1466,15 +1474,13 @@
 
           const textarea = document.createElement('textarea')
           textarea.className = 'review-textarea'
-          if (item.modified === true) {
-            textarea.classList.add('is-imported-modified')
-            textarea.title = '该文案在导入的人工核对稿中已修改'
-          }
           textarea.rows = 1
           textarea.value = values[index]
+          syncReviewTextareaModifiedState(textarea, item)
           textarea.setAttribute('aria-label', `第 ${index + 1} 条中文文案`)
           textarea.addEventListener('input', function () {
             resizeTextarea(textarea)
+            syncReviewTextareaModifiedState(textarea, item)
             updateReviewDraft(page)
           })
 
