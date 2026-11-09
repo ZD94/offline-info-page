@@ -893,13 +893,13 @@
 
   <p id="selectionStatus" class="selection-status" role="status" aria-live="polite">当前目标语言：中文；截图固定为中文，第 1 页，问卷介绍</p>
 
-  <script src="assets/data/zh-questionnaire-text.js?v=20261106-28"></script>
-  <script src="assets/data/pre-questionnaire-text.js?v=20261106-28"></script>
-  <script src="assets/data/post-questionnaire-text.js?v=20261106-28"></script>
-  <script src="assets/data/zh-questionnaire-variants.js?v=20261106-28"></script>
-  <script src="assets/data/review-questionnaire-text.js?v=20261106-28"></script>
-  <script src="assets/data/ai-questionnaire-translations.js?v=20261106-28"></script>
-  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261106-28"></script>
+  <script src="assets/data/zh-questionnaire-text.js?v=20261109-01"></script>
+  <script src="assets/data/pre-questionnaire-text.js?v=20261109-01"></script>
+  <script src="assets/data/post-questionnaire-text.js?v=20261109-01"></script>
+  <script src="assets/data/zh-questionnaire-variants.js?v=20261109-01"></script>
+  <script src="assets/data/review-questionnaire-text.js?v=20261109-01"></script>
+  <script src="assets/data/ai-questionnaire-translations.js?v=20261109-02"></script>
+  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261109-03"></script>
   <script>
     (function () {
       'use strict'
@@ -908,7 +908,7 @@
       const PAGE_STORAGE_KEY = 'multilingual-page:questionnaire-page:v2'
       const REVIEW_STORAGE_KEY = 'multilingual-page:manual-review:v2'
       const SCREENSHOT_LANGUAGE = 'zh'
-      const ASSET_VERSION = '20261106-28'
+      const ASSET_VERSION = '20261109-01'
       const baselinePages = (window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
         ...page,
         items: page.items.map(item => ({ ...item }))
@@ -1150,6 +1150,7 @@
         syncVariantButtons()
         renderCurrentScreenshot()
         renderChineseTexts(currentPage)
+        renderAiTranslations(currentPage)
         renderManualReview(currentPage)
         updateSelectionStatus()
       }
@@ -1329,7 +1330,7 @@
       }
 
       function renderAiTranslations (pageIndex) {
-        const page = window.QUESTIONNAIRE_TEXTS?.[pageIndex]
+        const page = reviewTargetForIndex(pageIndex)
         const paddedNumber = String(pageIndex + 1).padStart(2, '0')
         const targetLanguage = languageLabels[currentLanguage]
         const isExternalLanguage = currentLanguage !== 'zh'
