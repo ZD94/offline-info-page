@@ -615,6 +615,10 @@
       list-style: none;
     }
 
+    .review-view[hidden] {
+      display: none;
+    }
+
     .review-text-item {
       display: grid;
       grid-template-columns: 38px minmax(0, 1fr);
@@ -655,6 +659,68 @@
     }
 
     .review-textarea.is-imported-modified:focus {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, .18);
+    }
+
+    .translation-review-fields {
+      display: grid;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .translation-review-field {
+      display: grid;
+      gap: 5px;
+    }
+
+    .translation-review-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .translation-review-source {
+      min-height: 42px;
+      padding: 9px 10px;
+      border: 1px solid #e7ebf1;
+      border-radius: 8px;
+      color: var(--text);
+      background: #f3f6fa;
+      font-size: 15px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .translation-review-textarea {
+      width: 100%;
+      min-height: 48px;
+      padding: 9px 10px;
+      overflow: hidden;
+      resize: vertical;
+      border: 1px solid #cfd8e5;
+      border-radius: 8px;
+      outline: 0;
+      color: var(--text);
+      background: #fff;
+      font: inherit;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .translation-review-textarea:focus {
+      border-color: #739dd8;
+      box-shadow: 0 0 0 3px rgba(115, 157, 216, .18);
+    }
+
+    .translation-review-textarea.is-reviewed-modified {
+      border: 2px solid #ef4444;
+      background: #fff7f7;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, .08);
+    }
+
+    .translation-review-textarea.is-reviewed-modified:focus {
       border-color: #dc2626;
       box-shadow: 0 0 0 3px rgba(239, 68, 68, .18);
     }
@@ -795,9 +861,9 @@
         <button class="language-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-language="ar-SA">阿拉伯语（沙特）</button>
       </div>
       <div class="review-mode-toolbar header-review-mode">
-        <div class="review-mode-switch" role="radiogroup" aria-label="选择人工核对模式">
-          <button class="review-mode-button is-selected" type="button" role="radio" aria-checked="true" tabindex="0" data-review-mode="baseline">中文基准核对</button>
-          <button class="review-mode-button" type="button" role="radio" aria-checked="false" tabindex="-1" data-review-mode="translation">多语言译文核对</button>
+        <div class="review-mode-switch" role="tablist" aria-label="选择人工核对模式">
+          <button id="baselineReviewTab" class="review-mode-button is-selected" type="button" role="tab" aria-selected="true" aria-controls="baselineReviewView" tabindex="0" data-review-mode="baseline">中文基准核对</button>
+          <button id="translationReviewTab" class="review-mode-button" type="button" role="tab" aria-selected="false" aria-controls="translationReviewView" tabindex="-1" data-review-mode="translation">多语言译文核对</button>
         </div>
       </div>
     </div>
@@ -865,29 +931,56 @@
       <ol id="aiTranslationList" class="ai-translation-list" aria-live="polite"></ol>
     </section>
 
-    <section class="content-area review-panel" aria-labelledby="manualReviewTitle">
-      <div class="baseline-heading">
-        <h2 id="manualReviewTitle" class="baseline-title">人工核对</h2>
-        <span class="readonly-badge editable-badge">可编辑</span>
-      </div>
-      <div class="content-heading">
-        <div>
-          <p id="reviewTextKicker" class="content-kicker">问卷页面 01</p>
-          <h3 id="reviewTextTitle" class="content-title">问卷介绍</h3>
+    <section class="content-area review-panel" aria-label="文案核对">
+      <div id="baselineReviewView" class="review-view" role="tabpanel" aria-labelledby="baselineReviewTab">
+        <div class="baseline-heading">
+          <h2 id="manualReviewTitle" class="baseline-title">人工核对</h2>
+          <span class="readonly-badge editable-badge">可编辑</span>
         </div>
+        <div class="content-heading">
+          <div>
+            <p id="reviewTextKicker" class="content-kicker">问卷页面 01</p>
+            <h3 id="reviewTextTitle" class="content-title">问卷介绍</h3>
+          </div>
+        </div>
+        <div class="content-summary">
+          <span>基于导入的人工核对稿继续修改并保存</span>
+          <span id="reviewTextCount" class="text-count">0 条</span>
+        </div>
+        <ol id="reviewTextList" class="review-text-list"></ol>
+        <div class="review-actions">
+          <button id="resetCurrentReview" class="action-button" type="button">重置当前页</button>
+          <button id="saveCurrentReview" class="action-button primary" type="button">保存当前页</button>
+          <button id="exportReviewedTexts" class="action-button export" type="button">导出修改后的文案</button>
+        </div>
+        <p class="export-hint">导出文件与 review-questionnaire-text.js 格式一致，会同时包含主页面与动态子项；不会自动覆盖项目中的原始数据文件。</p>
+        <p id="reviewStatus" class="review-status" role="status" aria-live="polite">已加载人工核对初始稿</p>
       </div>
-      <div class="content-summary">
-        <span>基于导入的人工核对稿继续修改并保存</span>
-        <span id="reviewTextCount" class="text-count">0 条</span>
+
+      <div id="translationReviewView" class="review-view" role="tabpanel" aria-labelledby="translationReviewTab" hidden>
+        <div class="baseline-heading">
+          <h2 class="baseline-title">多语言译文核对</h2>
+          <span class="readonly-badge editable-badge">译文可编辑</span>
+        </div>
+        <div class="content-heading">
+          <div>
+            <p id="translationReviewKicker" class="content-kicker">问卷页面 01</p>
+            <h3 id="translationReviewTitle" class="content-title">问卷介绍</h3>
+          </div>
+        </div>
+        <div class="content-summary">
+          <span id="translationReviewSummary">中文原文只读；请选择目标语言</span>
+          <span id="translationReviewCount" class="text-count">0 条</span>
+        </div>
+        <ol id="translationReviewList" class="review-text-list"></ol>
+        <div class="review-actions">
+          <button id="resetCurrentTranslationReview" class="action-button" type="button">重置当前页</button>
+          <button id="saveCurrentTranslationReview" class="action-button primary" type="button">保存当前页</button>
+          <button id="exportReviewedTranslations" class="action-button export" type="button">导出核对后的译文</button>
+        </div>
+        <p class="export-hint">译文核对使用独立草稿与存储，导出文件按目标语言、页面、子项和条目保存，不会修改中文人工核对稿。</p>
+        <p id="translationReviewStatus" class="review-status" role="status" aria-live="polite">请从上方选择一种目标语言</p>
       </div>
-      <ol id="reviewTextList" class="review-text-list"></ol>
-      <div class="review-actions">
-        <button id="resetCurrentReview" class="action-button" type="button">重置当前页</button>
-        <button id="saveCurrentReview" class="action-button primary" type="button">保存当前页</button>
-        <button id="exportReviewedTexts" class="action-button export" type="button">导出修改后的文案</button>
-      </div>
-      <p class="export-hint">导出文件与 review-questionnaire-text.js 格式一致，会同时包含主页面与动态子项；不会自动覆盖项目中的原始数据文件。</p>
-      <p id="reviewStatus" class="review-status" role="status" aria-live="polite">已加载人工核对初始稿</p>
     </section>
   </main>
 
@@ -907,6 +1000,9 @@
       const LANGUAGE_STORAGE_KEY = 'multilingual-page:language'
       const PAGE_STORAGE_KEY = 'multilingual-page:questionnaire-page:v2'
       const REVIEW_STORAGE_KEY = 'multilingual-page:manual-review:v2'
+      const REVIEW_MODE_STORAGE_KEY = 'multilingual-page:review-mode:v1'
+      const TRANSLATION_REVIEW_STORAGE_KEY = 'multilingual-page:translation-review:v1'
+      const TRANSLATION_LANGUAGE_STORAGE_KEY = 'multilingual-page:translation-review-language:v1'
       const SCREENSHOT_LANGUAGE = 'zh'
       const ASSET_VERSION = '20261109-01'
       const baselinePages = (window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
@@ -933,7 +1029,7 @@
       const languageCodes = { zh: 'zh-CN', en: 'en', th: 'th', ms: 'ms', de: 'de', tr: 'tr', fr: 'fr', uk: 'uk', 'ar-SA': 'ar-SA' }
       const languageButtons = Array.from(document.querySelectorAll('.language-button'))
       const reviewModeButtons = Array.from(document.querySelectorAll('.review-mode-button'))
-      let currentReviewMode = 'baseline'
+      let currentReviewMode = readStorage(REVIEW_MODE_STORAGE_KEY, 'baseline')
       const elements = {
         pageHeader: document.querySelector('.page-header'),
         pageKicker: document.querySelector('#pageKicker'),
@@ -959,10 +1055,21 @@
         reviewTextTitle: document.querySelector('#reviewTextTitle'),
         reviewTextCount: document.querySelector('#reviewTextCount'),
         reviewTextList: document.querySelector('#reviewTextList'),
+        baselineReviewView: document.querySelector('#baselineReviewView'),
+        translationReviewView: document.querySelector('#translationReviewView'),
+        translationReviewKicker: document.querySelector('#translationReviewKicker'),
+        translationReviewTitle: document.querySelector('#translationReviewTitle'),
+        translationReviewSummary: document.querySelector('#translationReviewSummary'),
+        translationReviewCount: document.querySelector('#translationReviewCount'),
+        translationReviewList: document.querySelector('#translationReviewList'),
         resetReview: document.querySelector('#resetCurrentReview'),
         saveReview: document.querySelector('#saveCurrentReview'),
         exportReviews: document.querySelector('#exportReviewedTexts'),
         reviewStatus: document.querySelector('#reviewStatus'),
+        resetTranslationReview: document.querySelector('#resetCurrentTranslationReview'),
+        saveTranslationReview: document.querySelector('#saveCurrentTranslationReview'),
+        exportTranslationReviews: document.querySelector('#exportReviewedTranslations'),
+        translationReviewStatus: document.querySelector('#translationReviewStatus'),
         status: document.querySelector('#selectionStatus')
       }
 
@@ -981,11 +1088,16 @@
 
       const reviewDrafts = new Map()
       let savedReviews = readSavedReviews()
+      const translationReviewDrafts = new Map()
+      let savedTranslationReviews = readSavedTranslationReviews()
 
       let currentLanguage = readStorage(LANGUAGE_STORAGE_KEY, 'zh')
+      let currentTranslationLanguage = readStorage(TRANSLATION_LANGUAGE_STORAGE_KEY, 'en')
       let currentPage = Number(readStorage(PAGE_STORAGE_KEY, '0'))
       let currentVariantId = null
       if (!Object.hasOwn(languageLabels, currentLanguage)) currentLanguage = 'zh'
+      if (!Object.hasOwn(languageLabels, currentTranslationLanguage) || currentTranslationLanguage === 'zh') currentTranslationLanguage = 'en'
+      if (!['baseline', 'translation'].includes(currentReviewMode)) currentReviewMode = 'baseline'
       if (!Number.isInteger(currentPage) || currentPage < 0 || currentPage >= pageNames.length) currentPage = 0
 
       function readStorage (key, fallback) {
@@ -1025,6 +1137,25 @@
 
       function arraysEqual (left, right) {
         return left.length === right.length && left.every((value, index) => value === right[index])
+      }
+
+      function readSavedTranslationReviews () {
+        try {
+          const value = JSON.parse(localStorage.getItem(TRANSLATION_REVIEW_STORAGE_KEY) ?? '{}')
+          return value && typeof value === 'object' && !Array.isArray(value) ? value : {}
+        } catch {
+          return {}
+        }
+      }
+
+      function persistSavedTranslationReviews () {
+        try {
+          if (Object.keys(savedTranslationReviews).length === 0) localStorage.removeItem(TRANSLATION_REVIEW_STORAGE_KEY)
+          else localStorage.setItem(TRANSLATION_REVIEW_STORAGE_KEY, JSON.stringify(savedTranslationReviews))
+          return true
+        } catch {
+          return false
+        }
       }
 
       function reviewPageForIndex (pageIndex) {
@@ -1075,6 +1206,42 @@
 
       function pageHasSavedChanges (page) {
         return !arraysEqual(savedPageValues(page), page.items.map(item => item.text))
+      }
+
+      function translationReviewDraftKey (language, page) {
+        return `${language}::${page.name}`
+      }
+
+      function translationReviewInitialValues (page, language, sourceValues = currentReviewValues(page)) {
+        const dictionary = window.AI_TRANSLATIONS?.[language] ?? {}
+        return page.items.map((item, index) => {
+          const sourceText = sourceValues[index] ?? item.text
+          if (item.dynamic) return sourceText
+          if (typeof dictionary[sourceText] === 'string') return dictionary[sourceText]
+          return typeof dictionary[item.text] === 'string' ? dictionary[item.text] : ''
+        })
+      }
+
+      function savedTranslationValues (page, language, sourceValues = currentReviewValues(page)) {
+        const initialValues = translationReviewInitialValues(page, language, sourceValues)
+        const saved = savedTranslationReviews[language]?.[page.name] ?? {}
+        return page.items.map((item, index) => {
+          const savedValue = saved[item.key]
+          if (typeof savedValue === 'string') return savedValue
+          if (savedValue && typeof savedValue === 'object' && typeof savedValue.translation === 'string') {
+            return savedValue.translation
+          }
+          return initialValues[index]
+        })
+      }
+
+      function currentTranslationReviewValues (page, language, sourceValues = currentReviewValues(page)) {
+        return translationReviewDrafts.get(translationReviewDraftKey(language, page)) ??
+          savedTranslationValues(page, language, sourceValues)
+      }
+
+      function translationPageHasSavedChanges (page, language) {
+        return Object.keys(savedTranslationReviews[language]?.[page.name] ?? {}).length > 0
       }
 
       function versionedAssetPath (assetPath) {
@@ -1151,7 +1318,7 @@
         renderCurrentScreenshot()
         renderChineseTexts(currentPage)
         renderAiTranslations(currentPage)
-        renderManualReview(currentPage)
+        renderActiveReview(currentPage)
         updateSelectionStatus()
       }
 
@@ -1242,7 +1409,7 @@
         renderCurrentScreenshot()
         renderChineseTexts(currentPage)
         renderAiTranslations(currentPage)
-        renderManualReview(currentPage)
+        renderActiveReview(currentPage)
 
         preloadAdjacentImage(currentPage - 1)
         preloadAdjacentImage(currentPage + 1)
@@ -1501,6 +1668,154 @@
         updateReviewState(page)
       }
 
+      function syncTranslationReviewModifiedState (textarea, initialValue) {
+        const isModified = textarea.value !== initialValue
+        textarea.classList.toggle('is-reviewed-modified', isModified)
+        if (isModified) textarea.title = '该译文相对 Codex 初稿已修改'
+        else textarea.removeAttribute('title')
+      }
+
+      function updateTranslationReviewState (page, language, message) {
+        if (!page || language === 'zh') {
+          elements.saveTranslationReview.disabled = true
+          elements.resetTranslationReview.disabled = true
+          elements.exportTranslationReviews.disabled = true
+          elements.translationReviewStatus.textContent = message ?? '请从上方选择一种目标语言'
+          return
+        }
+
+        const draftKey = translationReviewDraftKey(language, page)
+        const hasDraft = translationReviewDrafts.has(draftKey)
+        const hasSavedChanges = translationPageHasSavedChanges(page, language)
+        const languageLabel = languageLabels[language]
+        elements.saveTranslationReview.disabled = !hasDraft
+        elements.resetTranslationReview.disabled = !hasDraft && !hasSavedChanges
+        elements.exportTranslationReviews.disabled = false
+
+        if (message) elements.translationReviewStatus.textContent = message
+        else if (hasDraft) elements.translationReviewStatus.textContent = `当前页有未保存的${languageLabel}译文修改`
+        else if (hasSavedChanges) elements.translationReviewStatus.textContent = `当前页${languageLabel}译文已保存到本浏览器`
+        else elements.translationReviewStatus.textContent = `当前页使用 Codex ${languageLabel}译文初稿`
+      }
+
+      function updateTranslationReviewDraft (page, language, sourceValues) {
+        const values = Array.from(
+          elements.translationReviewList.querySelectorAll('.translation-review-textarea'),
+          textarea => textarea.value
+        )
+        const savedValues = savedTranslationValues(page, language, sourceValues)
+        const draftKey = translationReviewDraftKey(language, page)
+        if (arraysEqual(values, savedValues)) translationReviewDrafts.delete(draftKey)
+        else translationReviewDrafts.set(draftKey, values)
+        updateTranslationReviewState(page, language)
+      }
+
+      function renderTranslationReview (pageIndex) {
+        const page = reviewTargetForIndex(pageIndex)
+        const language = currentLanguage
+        const paddedNumber = String(pageIndex + 1).padStart(2, '0')
+        const languageLabel = languageLabels[language]
+        elements.translationReviewKicker.textContent = page?.isVariant
+          ? `问卷页面 ${paddedNumber} · 子项`
+          : `问卷页面 ${paddedNumber}`
+        elements.translationReviewTitle.textContent = page?.label ?? pageNames[pageIndex]
+        elements.translationReviewSummary.textContent = language === 'zh'
+          ? '中文原文只读；请从上方选择目标语言'
+          : `中文原文只读；${languageLabel}译文可编辑`
+        elements.translationReviewList.replaceChildren()
+
+        if (language === 'zh') {
+          elements.translationReviewCount.textContent = '0 条'
+          const empty = document.createElement('li')
+          empty.className = 'text-empty'
+          empty.textContent = '多语言译文核对不以中文作为目标语言，请从上方选择英文或其他语言。'
+          elements.translationReviewList.append(empty)
+          updateTranslationReviewState(page, language)
+          return
+        }
+
+        if (!page || page.items.length === 0) {
+          elements.translationReviewCount.textContent = '0 条'
+          const empty = document.createElement('li')
+          empty.className = 'text-empty'
+          empty.textContent = '该页面暂时没有可核对的译文。'
+          elements.translationReviewList.append(empty)
+          updateTranslationReviewState(page, language, '当前页没有可编辑内容')
+          return
+        }
+
+        const sourceValues = currentReviewValues(page)
+        const initialValues = translationReviewInitialValues(page, language, sourceValues)
+        const values = currentTranslationReviewValues(page, language, sourceValues)
+        elements.translationReviewCount.textContent = `${page.items.length} 条`
+
+        page.items.forEach((item, index) => {
+          const row = document.createElement('li')
+          row.className = 'review-text-item translation-review-item'
+
+          const number = document.createElement('span')
+          number.className = 'text-index'
+          number.textContent = String(index + 1).padStart(2, '0')
+
+          const fields = document.createElement('div')
+          fields.className = 'translation-review-fields'
+
+          const sourceField = document.createElement('div')
+          sourceField.className = 'translation-review-field'
+          const sourceLabel = document.createElement('span')
+          sourceLabel.className = 'translation-review-label'
+          sourceLabel.textContent = '中文原文（只读）'
+          const source = document.createElement('div')
+          source.className = 'translation-review-source'
+          source.lang = 'zh-CN'
+          source.dir = 'auto'
+          source.textContent = sourceValues[index]
+          sourceField.append(sourceLabel, source)
+
+          const targetField = document.createElement('label')
+          targetField.className = 'translation-review-field'
+          const targetLabel = document.createElement('span')
+          targetLabel.className = 'translation-review-label'
+          targetLabel.textContent = `${languageLabel}译文（可编辑）`
+          const textarea = document.createElement('textarea')
+          textarea.className = 'translation-review-textarea'
+          textarea.rows = 1
+          textarea.value = values[index]
+          textarea.lang = languageCodes[language]
+          textarea.dir = 'auto'
+          textarea.placeholder = `请输入${languageLabel}译文`
+          textarea.setAttribute('aria-label', `第 ${index + 1} 条${languageLabel}译文`)
+          syncTranslationReviewModifiedState(textarea, initialValues[index])
+          textarea.addEventListener('input', function () {
+            resizeTextarea(textarea)
+            syncTranslationReviewModifiedState(textarea, initialValues[index])
+            updateTranslationReviewDraft(page, language, sourceValues)
+          })
+          targetField.append(targetLabel, textarea)
+
+          fields.append(sourceField, targetField)
+          row.append(number, fields)
+          if (item.dynamic) {
+            const meta = document.createElement('div')
+            meta.className = 'review-item-meta'
+            const badge = document.createElement('span')
+            badge.className = 'dynamic-badge'
+            badge.textContent = '动态内容'
+            meta.append(badge)
+            row.append(meta)
+          }
+          elements.translationReviewList.append(row)
+          resizeTextarea(textarea)
+        })
+
+        updateTranslationReviewState(page, language)
+      }
+
+      function renderActiveReview (pageIndex = currentPage) {
+        if (currentReviewMode === 'translation') renderTranslationReview(pageIndex)
+        else renderManualReview(pageIndex)
+      }
+
       function saveCurrentReview () {
         const page = reviewTargetForIndex(currentPage)
         if (!page) return
@@ -1527,6 +1842,65 @@
         const persisted = persistSavedReviews()
         renderManualReview(currentPage)
         updateReviewState(page, persisted ? '当前页已重置为人工核对初始稿' : '当前页已在本次打开期间重置')
+      }
+
+      function saveCurrentTranslationReview () {
+        const page = reviewTargetForIndex(currentPage)
+        const language = currentLanguage
+        if (!page || language === 'zh') return
+
+        const sourceValues = currentReviewValues(page)
+        const initialValues = translationReviewInitialValues(page, language, sourceValues)
+        const values = Array.from(
+          elements.translationReviewList.querySelectorAll('.translation-review-textarea'),
+          textarea => textarea.value
+        )
+        const changes = {}
+        page.items.forEach((item, index) => {
+          if (values[index] !== initialValues[index]) {
+            changes[item.key] = {
+              sourceText: sourceValues[index],
+              translation: values[index]
+            }
+          }
+        })
+
+        if (!savedTranslationReviews[language]) savedTranslationReviews[language] = {}
+        if (Object.keys(changes).length === 0) delete savedTranslationReviews[language][page.name]
+        else savedTranslationReviews[language][page.name] = changes
+        if (Object.keys(savedTranslationReviews[language]).length === 0) delete savedTranslationReviews[language]
+        translationReviewDrafts.delete(translationReviewDraftKey(language, page))
+
+        const persisted = persistSavedTranslationReviews()
+        renderTranslationReview(currentPage)
+        updateTranslationReviewState(
+          page,
+          language,
+          persisted
+            ? `当前页${languageLabels[language]}译文修改已保存`
+            : '浏览器存储不可用，译文修改仅在本次打开期间有效'
+        )
+      }
+
+      function resetCurrentTranslationReview () {
+        const page = reviewTargetForIndex(currentPage)
+        const language = currentLanguage
+        if (!page || language === 'zh') return
+
+        if (savedTranslationReviews[language]) {
+          delete savedTranslationReviews[language][page.name]
+          if (Object.keys(savedTranslationReviews[language]).length === 0) delete savedTranslationReviews[language]
+        }
+        translationReviewDrafts.delete(translationReviewDraftKey(language, page))
+        const persisted = persistSavedTranslationReviews()
+        renderTranslationReview(currentPage)
+        updateTranslationReviewState(
+          page,
+          language,
+          persisted
+            ? `当前页已重置为 Codex ${languageLabels[language]}译文初稿`
+            : '当前页译文已在本次打开期间重置'
+        )
       }
 
       function createReviewedExport () {
@@ -1621,11 +1995,116 @@
           : `已导出 ${fileName}；完整保留 ${reviewPages.length} 页主页面和 ${exportedVariantCount} 个动态子项，其中 ${savedPageCount} 个主页面、${savedVariantCount} 个子项包含本次保存的修改`
       }
 
+      function createReviewedTranslationPage (page, language) {
+        const savedSources = savedPageValues(page)
+        const savedTranslations = savedTranslationReviews[language]?.[page.name] ?? {}
+        const sourceValues = page.items.map((item, index) => {
+          const savedValue = savedTranslations[item.key]
+          return savedValue && typeof savedValue === 'object' && typeof savedValue.sourceText === 'string'
+            ? savedValue.sourceText
+            : savedSources[index]
+        })
+        const initialValues = translationReviewInitialValues(page, language, sourceValues)
+        const translatedValues = savedTranslationValues(page, language, sourceValues)
+        return {
+          order: page.order,
+          name: page.name,
+          label: page.label,
+          screenshot: page.screenshot,
+          items: page.items.map((item, index) => ({
+            key: item.key,
+            sourceText: sourceValues[index],
+            translation: translatedValues[index],
+            dynamic: Boolean(item.dynamic),
+            modified: translatedValues[index] !== initialValues[index]
+          }))
+        }
+      }
+
+      function createReviewedTranslationVariantExport (language) {
+        const exportedVariants = {}
+
+        baselinePages.forEach((page, pageIndex) => {
+          const variants = variantsForPage(pageIndex)
+          if (variants.length === 0) return
+
+          exportedVariants[page.name] = variants.map((variant, index) => {
+            const target = reviewTargetForVariant(pageIndex, variant, index)
+            const exported = createReviewedTranslationPage(target, language)
+            return {
+              id: variantId(variant, index),
+              order: variant.order ?? index + 1,
+              ...exported
+            }
+          })
+        })
+
+        return exportedVariants
+      }
+
+      function exportReviewedTranslations () {
+        const language = currentLanguage
+        if (language === 'zh') {
+          elements.translationReviewStatus.textContent = '请先从上方选择一种目标语言再导出'
+          return
+        }
+
+        const exportedAt = new Date()
+        const payload = {
+          metadata: {
+            schemaVersion: 1,
+            sourceLocale: 'zh-CN',
+            targetLocale: languageCodes[language],
+            targetLanguage: languageLabels[language],
+            exportedAt: exportedAt.toISOString()
+          },
+          pages: reviewPages.map(page => createReviewedTranslationPage(page, language)),
+          variants: createReviewedTranslationVariantExport(language)
+        }
+        const source = `window.REVIEWED_QUESTIONNAIRE_TRANSLATIONS = ${JSON.stringify(payload, null, 2)}\n`
+        const blob = new Blob([source], { type: 'text/javascript;charset=utf-8' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        const timestamp = [
+          exportedAt.getFullYear(),
+          String(exportedAt.getMonth() + 1).padStart(2, '0'),
+          String(exportedAt.getDate()).padStart(2, '0'),
+          '-',
+          String(exportedAt.getHours()).padStart(2, '0'),
+          String(exportedAt.getMinutes()).padStart(2, '0'),
+          String(exportedAt.getSeconds()).padStart(2, '0')
+        ].join('')
+        const savedTargets = Object.keys(savedTranslationReviews[language] ?? {})
+        const savedPageCount = savedTargets.filter(name => !name.includes('::')).length
+        const savedVariantCount = savedTargets.length - savedPageCount
+        const fileName = `reviewed-questionnaire-translations.${language}-${savedPageCount}pages-${savedVariantCount}variants-${timestamp}.js`
+        link.href = url
+        link.download = fileName
+        document.body.append(link)
+        link.click()
+        link.remove()
+        URL.revokeObjectURL(url)
+
+        const hasDrafts = Array.from(translationReviewDrafts.keys()).some(key => key.startsWith(`${language}::`))
+        elements.translationReviewStatus.textContent = hasDrafts
+          ? `已导出 ${fileName}；${languageLabels[language]}未保存修改不会写入文件`
+          : `已导出 ${fileName}；按页面、子项和条目保留完整${languageLabels[language]}译文`
+      }
+
       function selectLanguage (language, announce) {
+        if (currentReviewMode === 'translation' && language === 'zh') {
+          elements.translationReviewStatus.textContent = `多语言译文核对需选择目标语言，已保留${languageLabels[currentLanguage]}`
+          return
+        }
         currentLanguage = language
         writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
+        if (currentLanguage !== 'zh') {
+          currentTranslationLanguage = currentLanguage
+          writeStorage(TRANSLATION_LANGUAGE_STORAGE_KEY, currentTranslationLanguage)
+        }
         renderLanguage()
         renderAiTranslations(currentPage)
+        renderActiveReview(currentPage)
 
         if (announce) {
           document.dispatchEvent(new CustomEvent('languagechange', {
@@ -1648,14 +2127,25 @@
         image.src = imagePath(SCREENSHOT_LANGUAGE, pageIndex)
       }
 
-      function selectReviewMode (mode) {
+      function selectReviewMode (mode, shouldRender = true) {
+        if (!['baseline', 'translation'].includes(mode)) return
         currentReviewMode = mode
+        writeStorage(REVIEW_MODE_STORAGE_KEY, currentReviewMode)
+        if (currentReviewMode === 'translation' && currentLanguage === 'zh') {
+          currentLanguage = currentTranslationLanguage
+          writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
+          renderLanguage()
+          renderAiTranslations(currentPage)
+        }
         reviewModeButtons.forEach(function (button) {
           const selected = button.dataset.reviewMode === currentReviewMode
           button.classList.toggle('is-selected', selected)
-          button.setAttribute('aria-checked', String(selected))
+          button.setAttribute('aria-selected', String(selected))
           button.tabIndex = selected ? 0 : -1
         })
+        elements.baselineReviewView.hidden = currentReviewMode !== 'baseline'
+        elements.translationReviewView.hidden = currentReviewMode !== 'translation'
+        if (shouldRender) renderActiveReview(currentPage)
       }
 
       languageButtons.forEach((button, index) => {
@@ -1701,6 +2191,9 @@
       elements.saveReview.addEventListener('click', saveCurrentReview)
       elements.resetReview.addEventListener('click', resetCurrentReview)
       elements.exportReviews.addEventListener('click', exportReviewedTexts)
+      elements.saveTranslationReview.addEventListener('click', saveCurrentTranslationReview)
+      elements.resetTranslationReview.addEventListener('click', resetCurrentTranslationReview)
+      elements.exportTranslationReviews.addEventListener('click', exportReviewedTranslations)
       elements.image.addEventListener('load', function () { elements.image.classList.remove('is-loading') })
       elements.image.addEventListener('error', function () {
         elements.image.classList.remove('is-loading')
@@ -1710,6 +2203,7 @@
       })
 
       renderLanguage()
+      selectReviewMode(currentReviewMode, false)
       renderPage()
     })()
   </script>
