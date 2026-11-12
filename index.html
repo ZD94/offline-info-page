@@ -2206,11 +2206,14 @@
 
       function selectReviewMode (mode, shouldRender = true) {
         if (!['baseline', 'translation'].includes(mode)) return
-        if (mode !== currentReviewMode) flushActiveReviewAutoSave()
+        const nextLanguage = mode === 'baseline'
+          ? 'zh'
+          : (currentLanguage === 'zh' ? currentTranslationLanguage : currentLanguage)
+        if (mode !== currentReviewMode || nextLanguage !== currentLanguage) flushActiveReviewAutoSave()
         currentReviewMode = mode
         writeStorage(REVIEW_MODE_STORAGE_KEY, currentReviewMode)
-        if (currentReviewMode === 'translation' && currentLanguage === 'zh') {
-          currentLanguage = currentTranslationLanguage
+        if (nextLanguage !== currentLanguage) {
+          currentLanguage = nextLanguage
           writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
           renderLanguage()
           renderAiTranslations(currentPage)
