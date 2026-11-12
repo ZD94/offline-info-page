@@ -4,7 +4,9 @@ window.REVIEWED_QUESTIONNAIRE_TRANSLATIONS = {
     "sourceLocale": "zh-CN",
     "targetLocale": "uk",
     "targetLanguage": "乌克兰语",
-    "exportedAt": "2026-11-09T08:00:00.000Z"
+    "exportedAt": "2026-11-09T08:00:00.000Z",
+    "kind": "reviewed",
+    "generatedAt": "2026-11-09T08:00:00.000Z"
   },
   "pages": [
     {

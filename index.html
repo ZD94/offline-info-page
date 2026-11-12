@@ -991,7 +991,6 @@
   <script src="assets/data/post-questionnaire-text.js?v=20261109-01"></script>
   <script src="assets/data/zh-questionnaire-variants.js?v=20261109-01"></script>
   <script src="assets/data/review-questionnaire-text.js?v=20261109-01"></script>
-  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261112-01"></script>
   <script>
     (function () {
       'use strict'
@@ -1004,7 +1003,7 @@
       const TRANSLATION_LANGUAGE_STORAGE_KEY = 'multilingual-page:translation-review-language:v1'
       const SCREENSHOT_LANGUAGE = 'zh'
       const ASSET_VERSION = '20261109-01'
-      const REVIEWED_TRANSLATION_SCHEMA_VERSION = 1
+      const TRANSLATION_PACKAGE_SCHEMA_VERSION = 1
       const TRANSLATION_PACKAGE_SESSION_VERSION = Date.now().toString(36)
       const baselinePages = (window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
         ...page,
@@ -1090,10 +1089,12 @@
       const reviewDrafts = new Map()
       let savedReviews = readSavedReviews()
       const translationReviewDrafts = new Map()
+      const codexTranslationPackages = new Map()
+      const deepSeekTranslationPackages = new Map()
       const reviewedTranslationPackages = new Map()
-      const reviewedTranslationPackageLoads = new Map()
+      const translationPackageLoads = new Map()
       let savedTranslationReviews = readSavedTranslationReviews()
-      let reviewedTranslationLoadQueue = Promise.resolve()
+      let translationPackageLoadQueue = Promise.resolve()
       let languageSelectionRequest = 0
       const AUTO_SAVE_DELAY_MS = 600
       let reviewAutoSaveTimer = null
@@ -1166,12 +1167,13 @@
         }
       }
 
-      function validateReviewedTranslationPackage (data, language) {
+      function validateTranslationPackage (data, language, kind) {
         const locale = languageCodes[language]
         if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('语言包不是有效对象')
-        if (data.metadata?.schemaVersion !== REVIEWED_TRANSLATION_SCHEMA_VERSION) {
+        if (data.metadata?.schemaVersion !== TRANSLATION_PACKAGE_SCHEMA_VERSION) {
           throw new Error(`不支持的 schemaVersion：${data.metadata?.schemaVersion ?? '缺失'}`)
         }
+        if (data.metadata.kind !== kind) throw new Error(`语言包类型不匹配：期望 ${kind}，实际 ${data.metadata.kind ?? '缺失'}`)
         if (data.metadata.sourceLocale !== 'zh-CN') throw new Error('sourceLocale 必须为 zh-CN')
         if (data.metadata.targetLocale !== locale) {
           throw new Error(`目标语言不匹配：期望 ${locale}，实际 ${data.metadata.targetLocale ?? '缺失'}`)
@@ -1229,29 +1231,42 @@
         return data
       }
 
-      function reviewedTranslationAssetPath (language) {
+      function translationPackageAssetPath (kind, language) {
         const locale = languageCodes[language]
-        return `assets/data/reviewed-questionnaire-translations.${locale}.js?v=${TRANSLATION_PACKAGE_SESSION_VERSION}`
+        return `assets/data/${kind}-questionnaire-translations.${locale}.js?v=${TRANSLATION_PACKAGE_SESSION_VERSION}`
       }
 
-      function loadReviewedTranslationPackage (language) {
-        if (language === 'zh') return Promise.resolve(undefined)
-        if (reviewedTranslationPackages.has(language)) {
-          return Promise.resolve(reviewedTranslationPackages.get(language))
-        }
-        if (reviewedTranslationPackageLoads.has(language)) return reviewedTranslationPackageLoads.get(language)
+      function translationPackageStore (kind) {
+        if (kind === 'codex') return codexTranslationPackages
+        if (kind === 'deepseek') return deepSeekTranslationPackages
+        return reviewedTranslationPackages
+      }
 
-        const load = reviewedTranslationLoadQueue.catch(function () {}).then(function () {
+      function translationPackageGlobal (kind) {
+        if (kind === 'codex') return 'CODEX_QUESTIONNAIRE_TRANSLATIONS'
+        if (kind === 'deepseek') return 'DEEPSEEK_QUESTIONNAIRE_TRANSLATIONS'
+        return 'REVIEWED_QUESTIONNAIRE_TRANSLATIONS'
+      }
+
+      function loadTranslationPackage (kind, language) {
+        if (language === 'zh') return Promise.resolve(undefined)
+        const store = translationPackageStore(kind)
+        const loadKey = `${kind}:${language}`
+        if (store.has(language)) return Promise.resolve(store.get(language))
+        if (translationPackageLoads.has(loadKey)) return translationPackageLoads.get(loadKey)
+
+        const load = translationPackageLoadQueue.catch(function () {}).then(function () {
           return new Promise(function (resolve, reject) {
             const script = document.createElement('script')
-            script.src = reviewedTranslationAssetPath(language)
+            const globalName = translationPackageGlobal(kind)
+            script.src = translationPackageAssetPath(kind, language)
             script.async = true
-            window.REVIEWED_QUESTIONNAIRE_TRANSLATIONS = undefined
+            window[globalName] = undefined
             script.addEventListener('load', function () {
               script.remove()
               try {
-                const data = validateReviewedTranslationPackage(window.REVIEWED_QUESTIONNAIRE_TRANSLATIONS, language)
-                reviewedTranslationPackages.set(language, data)
+                const data = validateTranslationPackage(window[globalName], language, kind)
+                store.set(language, data)
                 resolve(data)
               } catch (error) {
                 reject(error)
@@ -1259,18 +1274,29 @@
             })
             script.addEventListener('error', function () {
               script.remove()
-              reject(new Error(`无法加载 ${reviewedTranslationAssetPath(language)}`))
+              reject(new Error(`无法加载 ${translationPackageAssetPath(kind, language)}`))
             })
             document.head.append(script)
           })
         })
-        reviewedTranslationLoadQueue = load
-        reviewedTranslationPackageLoads.set(language, load)
+        translationPackageLoadQueue = load
+        translationPackageLoads.set(loadKey, load)
         load.then(
-          function () { reviewedTranslationPackageLoads.delete(language) },
-          function () { reviewedTranslationPackageLoads.delete(language) }
+          function () { translationPackageLoads.delete(loadKey) },
+          function () { translationPackageLoads.delete(loadKey) }
         )
         return load
+      }
+
+      function loadLanguageTranslationPackages (language) {
+        if (language === 'zh') return Promise.resolve()
+        return Promise.all([
+          loadTranslationPackage('codex', language),
+          loadTranslationPackage('deepseek', language),
+          loadTranslationPackage('reviewed', language).catch(function () {
+            reviewedTranslationPackages.set(language, codexTranslationPackages.get(language))
+          })
+        ])
       }
 
       function reportTranslationPackageError (language, error) {
@@ -1338,17 +1364,11 @@
 
       function translationTargetData (data, language, page) {
         if (!data || !page) return undefined
-        if (Array.isArray(data.pages)) {
-          if (data.metadata?.targetLocale !== languageCodes[language]) return undefined
-          if (page.isVariant) {
-            return data.variants?.[page.parentPageName]?.find(variant => variant?.id === page.variantId)
-          }
-          return data.pages.find(candidate => candidate?.name === page.name)
+        if (data.metadata?.targetLocale !== languageCodes[language]) return undefined
+        if (page.isVariant) {
+          return data.variants?.[page.parentPageName]?.find(variant => variant?.id === page.variantId)
         }
-        const locale = data.locales?.[language]
-        if (!locale) return undefined
-        if (page.isVariant) return locale.variants?.[page.parentPageName]?.[page.variantId]
-        return locale.pages?.[page.name]
+        return data.pages.find(candidate => candidate?.name === page.name)
       }
 
       function translationItemValue (data, language, page, item) {
@@ -1364,7 +1384,7 @@
       }
 
       function translationReviewSourceValues (page, language) {
-        const data = reviewedTranslationPackages.get(language)
+        const data = reviewedTranslationPackages.get(language) ?? codexTranslationPackages.get(language)
         const fallback = currentReviewValues(page)
         return page.items.map((item, index) => (
           translationItemSourceText(data, language, page, item) ?? fallback[index]
@@ -1375,7 +1395,8 @@
         return page.items.map((item, index) => {
           const sourceText = sourceValues[index] ?? item.text
           if (item.dynamic) return sourceText
-          return translationItemValue(reviewedTranslationPackages.get(language), language, page, item) ?? ''
+          const data = reviewedTranslationPackages.get(language) ?? codexTranslationPackages.get(language)
+          return translationItemValue(data, language, page, item) ?? ''
         })
       }
 
@@ -1660,10 +1681,10 @@
         const targetLanguage = languageLabels[currentLanguage]
         const isExternalLanguage = currentLanguage !== 'zh'
         const codexLabel = isExternalLanguage ? `Codex ${targetLanguage}` : 'Codex 中文校对'
-        const codexData = reviewedTranslationPackages.get(currentLanguage)
+        const codexData = codexTranslationPackages.get(currentLanguage)
         const hasCodexLocale = !isExternalLanguage || Boolean(codexData)
-        const deepSeekData = window.DEEPSEEK_TRANSLATIONS ?? {}
-        const deepSeekModel = deepSeekData.metadata?.model ?? 'deepseek-chat'
+        const deepSeekData = deepSeekTranslationPackages.get(currentLanguage)
+        const deepSeekModel = deepSeekData?.metadata?.model ?? 'deepseek-chat'
 
         elements.aiLanguageBadge.textContent = isExternalLanguage
           ? (hasCodexLocale ? '双模型' : 'DeepSeek')
@@ -1838,7 +1859,7 @@
       function syncTranslationReviewModifiedState (textarea, initialValue) {
         const isModified = textarea.value !== initialValue
         textarea.classList.toggle('is-reviewed-modified', isModified)
-        if (isModified) textarea.title = '该译文相对 Codex 初稿已修改'
+        if (isModified) textarea.title = '该译文相对当前人工核对底稿已修改'
         else textarea.removeAttribute('title')
       }
 
@@ -1862,7 +1883,11 @@
         if (message) elements.translationReviewStatus.textContent = message
         else if (hasDraft) elements.translationReviewStatus.textContent = `当前页${languageLabel}译文有修改，正在自动保存…`
         else if (hasSavedChanges) elements.translationReviewStatus.textContent = `当前页${languageLabel}译文已保存到本浏览器`
-        else elements.translationReviewStatus.textContent = `当前页使用 Codex ${languageLabel}译文初稿`
+        else if (reviewedTranslationPackages.get(language)?.metadata?.kind === 'reviewed') {
+          elements.translationReviewStatus.textContent = `当前页使用已部署的${languageLabel}人工核对稿`
+        } else {
+          elements.translationReviewStatus.textContent = `当前页暂无人工核对稿，使用 Codex ${languageLabel}译文初稿`
+        }
       }
 
       function updateTranslationReviewDraft (page, language, sourceValues) {
@@ -2132,7 +2157,7 @@
           page,
           language,
           persisted
-            ? `当前页已重置为 Codex ${languageLabels[language]}译文初稿`
+            ? `当前页已重置为已部署的${languageLabels[language]}人工核对稿`
             : '当前页译文已在本次打开期间重置'
         )
       }
@@ -2289,9 +2314,11 @@
         const payload = {
           metadata: {
             schemaVersion: 1,
+            kind: 'reviewed',
             sourceLocale: 'zh-CN',
             targetLocale: languageCodes[language],
             targetLanguage: languageLabels[language],
+            generatedAt: exportedAt.toISOString(),
             exportedAt: exportedAt.toISOString()
           },
           pages: reviewPages.map(page => createReviewedTranslationPage(page, language)),
@@ -2334,7 +2361,7 @@
           elements.status.textContent = `正在加载${languageLabels[language]}译文语言包…`
           elements.translationReviewStatus.textContent = `正在加载${languageLabels[language]}译文语言包…`
         }
-        return loadReviewedTranslationPackage(language).then(function () {
+        return loadLanguageTranslationPackages(language).then(function () {
           if (request !== languageSelectionRequest) return
           currentLanguage = language
           writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
@@ -2408,7 +2435,7 @@
           elements.status.textContent = `正在加载${languageLabels[nextLanguage]}译文语言包…`
           elements.translationReviewStatus.textContent = `正在加载${languageLabels[nextLanguage]}译文语言包…`
         }
-        return loadReviewedTranslationPackage(nextLanguage).then(function () {
+        return loadLanguageTranslationPackages(nextLanguage).then(function () {
           if (request !== languageSelectionRequest) return
           applyReviewMode(mode, shouldRender)
         }).catch(function (error) {
@@ -2475,7 +2502,7 @@
         const initialLanguage = currentReviewMode === 'baseline'
           ? 'zh'
           : (currentLanguage === 'zh' ? currentTranslationLanguage : currentLanguage)
-        return loadReviewedTranslationPackage(initialLanguage).then(function () {
+        return loadLanguageTranslationPackages(initialLanguage).then(function () {
           currentLanguage = initialLanguage
           renderLanguage()
           applyReviewMode(currentReviewMode, false)

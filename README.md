@@ -4,30 +4,32 @@
 
 页面顶部用于选择后续处理的目标语言（中文、英文、泰语、马来语、德语、土耳其语、法语、乌克兰语或阿拉伯语〔沙特〕）；主体从左到右分为：
 
-1. 固定显示中文的 22 页最新问卷截图；截图会充分利用左侧卡片高度，按原始比例完整缩放显示，不使用内部滚动条，切换顶部目标语言不会改变或重新加载截图。
+1. 固定显示中文的 39 页最新问卷截图；截图会充分利用左侧卡片高度，按原始比例完整缩放显示，不使用内部滚动条，切换顶部目标语言不会改变或重新加载截图。
 2. 只读的中文基准文案。
 3. `AI翻译` 区域，跟随顶部目标语言和当前问卷页联动，逐条对照展示中文原文、Codex 翻译与 DeepSeek 翻译。
-4. 人工核对区域，可编辑当前页中文文案。
+4. 人工核对区域；中文模式编辑中文核对稿，多语言模式编辑独立的人工核对译文。
 
 ## AI 翻译
 
 - 选择任一非中文目标语言后，AI 翻译区会立即切换到对应语言。
 - 英文、泰语、马来语、德语、土耳其语、法语、乌克兰语和阿拉伯语（沙特）均逐条展示中文原文、Codex 翻译和 DeepSeek 翻译，便于双模型比较。
-- 八种非中文语言的 Codex 静态译文已按中文提示词 `questionnaire-localization-v3` 复核过上一版的 115 条固定文案。中文基准现已更新为 22 页；发生变化和新增的文案会明确显示“待补充”，不能被旧译文冒充为最新结果。
+- 八种非中文语言均覆盖 39 个主页面、22 个动态子页和 673 条页面内容。
 - 固定文案已进行语法和自然度校对；动态数字、体重和日期值按原值保留。
 - 选择“中文”时，右侧展示 Codex 中文校对结果。
-- Codex 候选的生成期总数据位于 `assets/data/ai-questionnaire-translations.js`；页面运行时按语言加载 `assets/data/reviewed-questionnaire-translations.<locale>.js`。DeepSeek 翻译仍位于 `assets/data/deepseek-questionnaire-translations.js`。
+- Codex 原始候选位于 `assets/data/codex-questionnaire-translations.<locale>.js`；DeepSeek 原始候选位于 `assets/data/deepseek-questionnaire-translations.<locale>.js`；人工核对底稿位于 `assets/data/reviewed-questionnaire-translations.<locale>.js`。三类数据相互独立。
 - 这些文件都是静态数据，浏览器不会调用外部 AI 接口，也不会接触 API Key。
 
-页面使用的 Codex 核对译文语言包与“导出核对后的译文”完全同构，每种语言一个文件：
+三类语言包与“导出核对后的译文”完全同构，每种语言、每种数据类型各一个文件：
 
 ```js
 window.REVIEWED_QUESTIONNAIRE_TRANSLATIONS = {
   metadata: {
     schemaVersion: 1,
+    kind: 'reviewed',
     sourceLocale: 'zh-CN',
     targetLocale: 'ms',
     targetLanguage: '马来语',
+    generatedAt: '2026-11-12T10:01:44.061Z',
     exportedAt: '2026-11-12T10:01:44.061Z'
   },
   pages: [{
@@ -47,7 +49,7 @@ window.REVIEWED_QUESTIONNAIRE_TRANSLATIONS = {
 }
 ```
 
-页面切换目标语言时只加载对应语言包，并在加载时校验语言、39 个主页面、22 个动态子页及稳定条目 key。查询参数按本次页面会话生成，刷新页面后会重新请求语言包，避免同名文件被浏览器旧缓存覆盖。
+页面切换目标语言时只加载该语言的 Codex、DeepSeek 和人工核对三个语言包，并在加载时校验类型、语言、39 个主页面、22 个动态子页及稳定条目 key。查询参数按本次页面会话生成，刷新页面后会重新请求语言包，避免同名文件被浏览器旧缓存覆盖。人工核对包不存在时，右侧会以 Codex 初稿作为兜底，但不会修改 Codex 原始文件。
 
 更新核对译文时，可将页面导出的文件重命名为稳定文件名后直接覆盖，例如：
 
@@ -57,11 +59,11 @@ reviewed-questionnaire-translations.en.js
 
 无需转换数组或重新合并多语言总文件。`modified` 作为导出审计字段保留；文件重新作为运行时基准加载后，页面以其中的 `sourceText` 和 `translation` 为初始内容，本地已经保存的人工修改仍作为覆盖层保留。
 
-`translation-data-schema.mjs` 仍是 Codex 生成期总数据与 DeepSeek 数据共用的 schema v2 构建模块；`build-reviewed-translation-packages.mjs` 将 Codex 总数据生成八个与导出格式一致的运行时语言包；`migrate-translation-data-schema.mjs` 仅用于把旧版平铺字典一次性迁移到生成期 schema v2。
+`translation-data-schema.mjs` 用于把翻译词典关联到稳定页面和条目 key；`questionnaire-translation-package.mjs` 负责把 Codex、DeepSeek 和人工核对结果写成统一的运行时/导出结构。Codex 构建不会覆盖人工核对文件。
 
-### 统一提示词约束
+### 翻译提示词约束
 
-Codex 与 DeepSeek 共用 `translation-prompt-config.mjs` 中的翻译规范。规范包含：
+DeepSeek 和非英文 Codex 草稿使用 `translation-prompt-config.mjs` 中的多语言翻译规范；英文 Codex 草稿使用 `translations/reference/` 下的健身问卷英文规范包。多语言规范包含：
 
 - 健身、减重问卷的产品背景和专业教练语气。
 - 忠实原意、自然语法、移动端长度、格式保留和禁止中文残留等共享约束。
@@ -69,7 +71,7 @@ Codex 与 DeepSeek 共用 `translation-prompt-config.mjs` 中的翻译规范。�
 - SPAX、BMI、BMR、目标体重、训练计划等固定术语表。
 - 每条文案所在的页面名称、页面顺序、文案顺序和 UI 类型，供模型消除歧义。
 
-当前提示词使用中文编写，版本为 `questionnaire-localization-v3`。Codex 静态译文在 `AI_TRANSLATION_METADATA` 中记录该版本和人工校对状态；DeepSeek 生成结果记录提示词版本及每个语言的提示词指纹。
+通用多语言提示词使用中文编写，版本为 `questionnaire-localization-v3`。英文 Codex 结果记录专用英文规范包 `fitness-questionnaire-en-US-v2.0.0` 和提示词 `fitness-questionnaire-en-US-prompt-v2.0.0`；其他 Codex 语言记录通用提示词版本。每个 DeepSeek 语言包记录提示词版本及该语言的提示词指纹。
 
 `test/web-codex-translations.test.js` 会自动检查八种 Codex 译文的现有静态数据是否有效、是否残留中文或首尾空格、是否遵循固定术语表，以及是否与 DeepSeek 保持独立结果。当前元数据会将新中文基准标记为待同步；重新生成全部译文后，应恢复完整覆盖检查。
 
@@ -99,7 +101,7 @@ npm.cmd run web:translate:deepseek
 生成器只发送去重后的固定中文文案，不发送截图和动态用户数据。结果会写入：
 
 ```text
-offline-web-mvp/assets/data/deepseek-questionnaire-translations.js
+offline-web-mvp/assets/data/deepseek-questionnaire-translations.<locale>.js
 ```
 
 逐文案缓存位于 `.qa-cache/deepseek-translations/`。中文、页面上下文、模型或提示词未变化时，再次运行不会重复请求；只有新增、修改、约束变化或校验失败的文案会重新调用接口。生成器会检查漏译、空译文和目标译文中的中文残留。
@@ -122,7 +124,7 @@ zh-questionnaire-text.reviewed-2pages-20261104-181745.js
 导出的内容仍是：
 
 ```js
-window.QUESTIONNAIRE_TEXTS = [/* 22 页完整数据 */]
+window.QUESTIONNAIRE_TEXTS = [/* 39 页完整数据 */]
 ```
 
 其页面和数组结构与 `assets/data/review-questionnaire-text.js` 一致，每条文案会保留两个审核字段：
@@ -157,7 +159,7 @@ http://127.0.0.1:4173
 
 ## 中文基准更新
 
-人工更新截图并完成 22 页截图清单后，先合并最新中文基准：
+人工更新截图并完成 39 页截图清单后，先合并最新中文基准：
 
 ```powershell
 node offline-web-mvp\merge-manual-zh-baseline.mjs
@@ -184,13 +186,14 @@ index.html
 assets/
 ├─ data/
 │  ├─ zh-questionnaire-text.js
-│  ├─ ai-questionnaire-translations.js
-│  └─ deepseek-questionnaire-translations.js
+│  ├─ codex-questionnaire-translations.<locale>.js
+│  ├─ deepseek-questionnaire-translations.<locale>.js
+│  └─ reviewed-questionnaire-translations.<locale>.js
 └─ screenshots/
-   └─ zh/01.png ... 22.png
+   └─ zh/01.png ... 39.png
 ```
 
-页面当前运行只需要 22 张中文截图；仓库中保留的 `en`、`th`、`ms` 截图属于历史/备用资源，不再由页面加载，可按后续需要保留或清理。页面没有 CDN、npm 包、数据库或外部接口依赖。
+页面运行只需要 39 张中文截图。页面没有 CDN、npm 包、数据库或外部接口依赖。
 
 `index.html` 通过 `ASSET_VERSION` 和脚本 URL 的 `?v=` 参数控制静态资源缓存。每次更新中文基准、AI 翻译数据或截图后，都需要同步修改该版本值，确保 GitHub Pages 访问者不会继续读取浏览器中的旧文件。
 
