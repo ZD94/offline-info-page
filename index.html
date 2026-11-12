@@ -944,7 +944,7 @@
           </div>
         </div>
         <div class="content-summary">
-          <span>基于导入的人工核对稿继续修改并保存</span>
+          <span>修改会自动保存；切换页面、子项、语言或核对模式前会立即保存</span>
           <span id="reviewTextCount" class="text-count">0 条</span>
         </div>
         <ol id="reviewTextList" class="review-text-list"></ol>
@@ -978,7 +978,7 @@
           <button id="saveCurrentTranslationReview" class="action-button primary" type="button">保存当前页</button>
           <button id="exportReviewedTranslations" class="action-button export" type="button">导出核对后的译文</button>
         </div>
-        <p class="export-hint">译文核对使用独立草稿与存储，导出文件按目标语言、页面、子项和条目保存，不会修改中文人工核对稿。</p>
+        <p class="export-hint">译文修改会自动保存；切换页面、子项、语言或核对模式前会立即保存。译文核对使用独立存储，不会修改中文人工核对稿。</p>
         <p id="translationReviewStatus" class="review-status" role="status" aria-live="polite">请从上方选择一种目标语言</p>
       </div>
     </section>
@@ -1090,6 +1090,9 @@
       let savedReviews = readSavedReviews()
       const translationReviewDrafts = new Map()
       let savedTranslationReviews = readSavedTranslationReviews()
+      const AUTO_SAVE_DELAY_MS = 600
+      let reviewAutoSaveTimer = null
+      let translationReviewAutoSaveTimer = null
 
       let currentLanguage = readStorage(LANGUAGE_STORAGE_KEY, 'zh')
       let currentTranslationLanguage = readStorage(TRANSLATION_LANGUAGE_STORAGE_KEY, 'en')
@@ -1313,6 +1316,7 @@
         const exists = id === null || variants.some((variant, index) => variantId(variant, index) === id)
         if (!exists || id === currentVariantId) return
 
+        flushActiveReviewAutoSave()
         currentVariantId = id
         syncVariantButtons()
         renderCurrentScreenshot()
@@ -1588,7 +1592,7 @@
         elements.resetReview.disabled = !hasDraft && !hasSavedChanges
 
         if (message) elements.reviewStatus.textContent = message
-        else if (hasDraft) elements.reviewStatus.textContent = '当前页有未保存修改'
+        else if (hasDraft) elements.reviewStatus.textContent = '当前页有修改，正在自动保存…'
         else if (hasSavedChanges) elements.reviewStatus.textContent = '当前页修改已保存到本浏览器'
         else elements.reviewStatus.textContent = '当前页使用人工核对初始稿'
       }
@@ -1596,8 +1600,13 @@
       function updateReviewDraft (page) {
         const values = Array.from(elements.reviewTextList.querySelectorAll('.review-textarea'), textarea => textarea.value)
         const savedValues = savedPageValues(page)
-        if (arraysEqual(values, savedValues)) reviewDrafts.delete(page.name)
-        else reviewDrafts.set(page.name, values)
+        if (arraysEqual(values, savedValues)) {
+          reviewDrafts.delete(page.name)
+          clearReviewAutoSaveTimer()
+        } else {
+          reviewDrafts.set(page.name, values)
+          scheduleReviewAutoSave()
+        }
         updateReviewState(page)
       }
 
@@ -1693,7 +1702,7 @@
         elements.exportTranslationReviews.disabled = false
 
         if (message) elements.translationReviewStatus.textContent = message
-        else if (hasDraft) elements.translationReviewStatus.textContent = `当前页有未保存的${languageLabel}译文修改`
+        else if (hasDraft) elements.translationReviewStatus.textContent = `当前页${languageLabel}译文有修改，正在自动保存…`
         else if (hasSavedChanges) elements.translationReviewStatus.textContent = `当前页${languageLabel}译文已保存到本浏览器`
         else elements.translationReviewStatus.textContent = `当前页使用 Codex ${languageLabel}译文初稿`
       }
@@ -1705,8 +1714,13 @@
         )
         const savedValues = savedTranslationValues(page, language, sourceValues)
         const draftKey = translationReviewDraftKey(language, page)
-        if (arraysEqual(values, savedValues)) translationReviewDrafts.delete(draftKey)
-        else translationReviewDrafts.set(draftKey, values)
+        if (arraysEqual(values, savedValues)) {
+          translationReviewDrafts.delete(draftKey)
+          clearTranslationReviewAutoSaveTimer()
+        } else {
+          translationReviewDrafts.set(draftKey, values)
+          scheduleTranslationReviewAutoSave()
+        }
         updateTranslationReviewState(page, language)
       }
 
@@ -1816,7 +1830,60 @@
         else renderManualReview(pageIndex)
       }
 
-      function saveCurrentReview () {
+      function clearReviewAutoSaveTimer () {
+        if (reviewAutoSaveTimer === null) return
+        window.clearTimeout(reviewAutoSaveTimer)
+        reviewAutoSaveTimer = null
+      }
+
+      function clearTranslationReviewAutoSaveTimer () {
+        if (translationReviewAutoSaveTimer === null) return
+        window.clearTimeout(translationReviewAutoSaveTimer)
+        translationReviewAutoSaveTimer = null
+      }
+
+      function scheduleReviewAutoSave () {
+        clearReviewAutoSaveTimer()
+        reviewAutoSaveTimer = window.setTimeout(function () {
+          reviewAutoSaveTimer = null
+          const page = reviewTargetForIndex(currentPage)
+          if (page && reviewDrafts.has(page.name)) {
+            saveCurrentReview({ automatic: true, render: false })
+          }
+        }, AUTO_SAVE_DELAY_MS)
+      }
+
+      function scheduleTranslationReviewAutoSave () {
+        clearTranslationReviewAutoSaveTimer()
+        translationReviewAutoSaveTimer = window.setTimeout(function () {
+          translationReviewAutoSaveTimer = null
+          const page = reviewTargetForIndex(currentPage)
+          const draftKey = page && translationReviewDraftKey(currentLanguage, page)
+          if (page && currentLanguage !== 'zh' && translationReviewDrafts.has(draftKey)) {
+            saveCurrentTranslationReview({ automatic: true, render: false })
+          }
+        }, AUTO_SAVE_DELAY_MS)
+      }
+
+      function flushActiveReviewAutoSave () {
+        const page = reviewTargetForIndex(currentPage)
+        if (!page) return
+
+        if (currentReviewMode === 'translation') {
+          clearTranslationReviewAutoSaveTimer()
+          if (currentLanguage !== 'zh' && translationReviewDrafts.has(translationReviewDraftKey(currentLanguage, page))) {
+            saveCurrentTranslationReview({ automatic: true, render: false })
+          }
+          return
+        }
+
+        clearReviewAutoSaveTimer()
+        if (reviewDrafts.has(page.name)) saveCurrentReview({ automatic: true, render: false })
+      }
+
+      function saveCurrentReview (options) {
+        const { automatic = false, render = true } = options ?? {}
+        clearReviewAutoSaveTimer()
         const page = reviewTargetForIndex(currentPage)
         if (!page) return
         const values = Array.from(elements.reviewTextList.querySelectorAll('.review-textarea'), textarea => textarea.value)
@@ -1830,11 +1897,17 @@
         reviewDrafts.delete(page.name)
 
         const persisted = persistSavedReviews()
-        renderManualReview(currentPage)
-        updateReviewState(page, persisted ? '当前页修改已保存' : '浏览器存储不可用，修改仅在本次打开期间有效')
+        if (render) renderManualReview(currentPage)
+        updateReviewState(
+          page,
+          persisted
+            ? (automatic ? '当前页修改已自动保存到本浏览器' : '当前页修改已保存')
+            : '浏览器存储不可用，修改仅在本次打开期间有效'
+        )
       }
 
       function resetCurrentReview () {
+        clearReviewAutoSaveTimer()
         const page = reviewTargetForIndex(currentPage)
         if (!page) return
         delete savedReviews[page.name]
@@ -1844,7 +1917,9 @@
         updateReviewState(page, persisted ? '当前页已重置为人工核对初始稿' : '当前页已在本次打开期间重置')
       }
 
-      function saveCurrentTranslationReview () {
+      function saveCurrentTranslationReview (options) {
+        const { automatic = false, render = true } = options ?? {}
+        clearTranslationReviewAutoSaveTimer()
         const page = reviewTargetForIndex(currentPage)
         const language = currentLanguage
         if (!page || language === 'zh') return
@@ -1872,17 +1947,18 @@
         translationReviewDrafts.delete(translationReviewDraftKey(language, page))
 
         const persisted = persistSavedTranslationReviews()
-        renderTranslationReview(currentPage)
+        if (render) renderTranslationReview(currentPage)
         updateTranslationReviewState(
           page,
           language,
           persisted
-            ? `当前页${languageLabels[language]}译文修改已保存`
+            ? `当前页${languageLabels[language]}译文修改已${automatic ? '自动' : ''}保存`
             : '浏览器存储不可用，译文修改仅在本次打开期间有效'
         )
       }
 
       function resetCurrentTranslationReview () {
+        clearTranslationReviewAutoSaveTimer()
         const page = reviewTargetForIndex(currentPage)
         const language = currentLanguage
         if (!page || language === 'zh') return
@@ -1953,6 +2029,7 @@
       }
 
       function exportReviewedTexts () {
+        flushActiveReviewAutoSave()
         const exportedPages = createReviewedExport()
         const exportedVariants = createReviewedVariantExport()
         const source = [
@@ -2043,6 +2120,7 @@
       }
 
       function exportReviewedTranslations () {
+        flushActiveReviewAutoSave()
         const language = currentLanguage
         if (language === 'zh') {
           elements.translationReviewStatus.textContent = '请先从上方选择一种目标语言再导出'
@@ -2096,6 +2174,7 @@
           elements.translationReviewStatus.textContent = `多语言译文核对需选择目标语言，已保留${languageLabels[currentLanguage]}`
           return
         }
+        flushActiveReviewAutoSave()
         currentLanguage = language
         writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
         if (currentLanguage !== 'zh') {
@@ -2115,6 +2194,7 @@
 
       function goToPage (pageIndex) {
         if (pageIndex < 0 || pageIndex >= pageNames.length || pageIndex === currentPage) return
+        flushActiveReviewAutoSave()
         currentPage = pageIndex
         currentVariantId = null
         writeStorage(PAGE_STORAGE_KEY, currentPage)
@@ -2129,6 +2209,7 @@
 
       function selectReviewMode (mode, shouldRender = true) {
         if (!['baseline', 'translation'].includes(mode)) return
+        if (mode !== currentReviewMode) flushActiveReviewAutoSave()
         currentReviewMode = mode
         writeStorage(REVIEW_MODE_STORAGE_KEY, currentReviewMode)
         if (currentReviewMode === 'translation' && currentLanguage === 'zh') {
@@ -2188,10 +2269,10 @@
 
       elements.previous.addEventListener('click', function () { goToPage(currentPage - 1) })
       elements.next.addEventListener('click', function () { goToPage(currentPage + 1) })
-      elements.saveReview.addEventListener('click', saveCurrentReview)
+      elements.saveReview.addEventListener('click', function () { saveCurrentReview() })
       elements.resetReview.addEventListener('click', resetCurrentReview)
       elements.exportReviews.addEventListener('click', exportReviewedTexts)
-      elements.saveTranslationReview.addEventListener('click', saveCurrentTranslationReview)
+      elements.saveTranslationReview.addEventListener('click', function () { saveCurrentTranslationReview() })
       elements.resetTranslationReview.addEventListener('click', resetCurrentTranslationReview)
       elements.exportTranslationReviews.addEventListener('click', exportReviewedTranslations)
       elements.image.addEventListener('load', function () { elements.image.classList.remove('is-loading') })
@@ -2201,6 +2282,7 @@
         const variantLabel = variant ? `子项“${variant.label}”` : '主页面'
         elements.status.textContent = `中文第 ${currentPage + 1} 页${variantLabel}截图加载失败`
       })
+      window.addEventListener('pagehide', flushActiveReviewAutoSave)
 
       renderLanguage()
       selectReviewMode(currentReviewMode, false)
