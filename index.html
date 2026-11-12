@@ -2170,10 +2170,6 @@
       }
 
       function selectLanguage (language, announce) {
-        if (currentReviewMode === 'translation' && language === 'zh') {
-          elements.translationReviewStatus.textContent = `多语言译文核对需选择目标语言，已保留${languageLabels[currentLanguage]}`
-          return
-        }
         flushActiveReviewAutoSave()
         currentLanguage = language
         writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
@@ -2181,6 +2177,7 @@
           currentTranslationLanguage = currentLanguage
           writeStorage(TRANSLATION_LANGUAGE_STORAGE_KEY, currentTranslationLanguage)
         }
+        selectReviewMode(currentLanguage === 'zh' ? 'baseline' : 'translation', false)
         renderLanguage()
         renderAiTranslations(currentPage)
         renderActiveReview(currentPage)
