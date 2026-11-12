@@ -991,8 +991,8 @@
   <script src="assets/data/post-questionnaire-text.js?v=20261109-01"></script>
   <script src="assets/data/zh-questionnaire-variants.js?v=20261109-01"></script>
   <script src="assets/data/review-questionnaire-text.js?v=20261109-01"></script>
-  <script src="assets/data/ai-questionnaire-translations.js?v=20261109-02"></script>
-  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261109-04"></script>
+  <script src="assets/data/ai-questionnaire-translations.js?v=20261112-01"></script>
+  <script src="assets/data/deepseek-questionnaire-translations.js?v=20261112-01"></script>
   <script>
     (function () {
       'use strict'
@@ -1174,6 +1174,8 @@
         return {
           order: pageIndex + 1,
           name: `${baselinePage.name}::${id}`,
+          parentPageName: baselinePage.name,
+          variantId: id,
           label: `${baselinePage.label} · ${reviewVariant.label || variant.label || `子项 ${index + 1}`}`,
           screenshot: reviewVariant.screenshot || variant.screenshot,
           isVariant: true,
@@ -1215,13 +1217,23 @@
         return `${language}::${page.name}`
       }
 
+      function translationTargetData (data, language, page) {
+        const locale = data?.locales?.[language]
+        if (!locale || !page) return undefined
+        if (page.isVariant) return locale.variants?.[page.parentPageName]?.[page.variantId]
+        return locale.pages?.[page.name]
+      }
+
+      function translationItemValue (data, language, page, item) {
+        const entry = translationTargetData(data, language, page)?.items?.[item.key]
+        return typeof entry?.translation === 'string' ? entry.translation : undefined
+      }
+
       function translationReviewInitialValues (page, language, sourceValues = currentReviewValues(page)) {
-        const dictionary = window.AI_TRANSLATIONS?.[language] ?? {}
         return page.items.map((item, index) => {
           const sourceText = sourceValues[index] ?? item.text
           if (item.dynamic) return sourceText
-          if (typeof dictionary[sourceText] === 'string') return dictionary[sourceText]
-          return typeof dictionary[item.text] === 'string' ? dictionary[item.text] : ''
+          return translationItemValue(window.AI_TRANSLATIONS, language, page, item) ?? ''
         })
       }
 
@@ -1506,10 +1518,9 @@
         const targetLanguage = languageLabels[currentLanguage]
         const isExternalLanguage = currentLanguage !== 'zh'
         const codexLabel = isExternalLanguage ? `Codex ${targetLanguage}` : 'Codex 中文校对'
-        const codexDictionary = window.AI_TRANSLATIONS?.[currentLanguage] ?? {}
-        const hasCodexLocale = !isExternalLanguage || Object.keys(codexDictionary).length > 0
+        const codexLocale = window.AI_TRANSLATIONS?.locales?.[currentLanguage]
+        const hasCodexLocale = !isExternalLanguage || Boolean(codexLocale)
         const deepSeekData = window.DEEPSEEK_TRANSLATIONS ?? {}
-        const deepSeekDictionary = deepSeekData.translations?.[currentLanguage] ?? {}
         const deepSeekModel = deepSeekData.metadata?.model ?? 'deepseek-chat'
 
         elements.aiLanguageBadge.textContent = isExternalLanguage
@@ -1536,11 +1547,13 @@
 
         elements.aiTranslationCount.textContent = `${page.items.length} 条`
         page.items.forEach((item, index) => {
-          const hasCodexTranslation = !isExternalLanguage || item.dynamic || typeof codexDictionary[item.text] === 'string'
+          const codexValue = translationItemValue(window.AI_TRANSLATIONS, currentLanguage, page, item)
+          const deepSeekValue = translationItemValue(deepSeekData, currentLanguage, page, item)
+          const hasCodexTranslation = !isExternalLanguage || item.dynamic || typeof codexValue === 'string'
           const codexTranslation = !isExternalLanguage || item.dynamic
             ? item.text
-            : codexDictionary[item.text]
-          const deepSeekTranslation = item.dynamic ? item.text : deepSeekDictionary[item.text]
+            : codexValue
+          const deepSeekTranslation = item.dynamic ? item.text : deepSeekValue
 
           const row = document.createElement('li')
           row.className = 'ai-translation-item'

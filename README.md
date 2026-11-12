@@ -19,6 +19,36 @@
 - Codex 翻译位于 `assets/data/ai-questionnaire-translations.js`；DeepSeek 翻译位于 `assets/data/deepseek-questionnaire-translations.js`。
 - 两份翻译都是随页面加载的静态数据，浏览器不会调用外部 AI 接口，也不会接触 API Key。
 
+Codex 与 DeepSeek 静态译文统一使用 schema v2，并通过稳定的页面名、子项 ID 和条目 key 定位，不再以中文原文作为字典 key：
+
+```js
+{
+  schemaVersion: 2,
+  sourceLocale: 'zh-CN',
+  locales: {
+    ms: {
+      pages: {
+        'prelude-splash': {
+          items: {
+            'prelude-splash|manual|text|2': {
+              sourceText: '享受你的运动',
+              translation: 'Nikmati setiap senaman anda'
+            }
+          }
+        }
+      },
+      variants: {
+        'question-height': {
+          'variant-01': { items: {} }
+        }
+      }
+    }
+  }
+}
+```
+
+`translation-data-schema.mjs` 是 Codex 与 DeepSeek 生成器共用的结构构建模块；`migrate-translation-data-schema.mjs` 仅用于把旧版平铺字典一次性迁移到 schema v2。
+
 ### 统一提示词约束
 
 Codex 与 DeepSeek 共用 `translation-prompt-config.mjs` 中的翻译规范。规范包含：
