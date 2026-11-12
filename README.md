@@ -16,38 +16,48 @@
 - 八种非中文语言的 Codex 静态译文已按中文提示词 `questionnaire-localization-v3` 复核过上一版的 115 条固定文案。中文基准现已更新为 22 页；发生变化和新增的文案会明确显示“待补充”，不能被旧译文冒充为最新结果。
 - 固定文案已进行语法和自然度校对；动态数字、体重和日期值按原值保留。
 - 选择“中文”时，右侧展示 Codex 中文校对结果。
-- Codex 翻译位于 `assets/data/ai-questionnaire-translations.js`；DeepSeek 翻译位于 `assets/data/deepseek-questionnaire-translations.js`。
-- 两份翻译都是随页面加载的静态数据，浏览器不会调用外部 AI 接口，也不会接触 API Key。
+- Codex 候选的生成期总数据位于 `assets/data/ai-questionnaire-translations.js`；页面运行时按语言加载 `assets/data/reviewed-questionnaire-translations.<locale>.js`。DeepSeek 翻译仍位于 `assets/data/deepseek-questionnaire-translations.js`。
+- 这些文件都是静态数据，浏览器不会调用外部 AI 接口，也不会接触 API Key。
 
-Codex 与 DeepSeek 静态译文统一使用 schema v2，并通过稳定的页面名、子项 ID 和条目 key 定位，不再以中文原文作为字典 key：
+页面使用的 Codex 核对译文语言包与“导出核对后的译文”完全同构，每种语言一个文件：
 
 ```js
-{
-  schemaVersion: 2,
-  sourceLocale: 'zh-CN',
-  locales: {
-    ms: {
-      pages: {
-        'prelude-splash': {
-          items: {
-            'prelude-splash|manual|text|2': {
-              sourceText: '享受你的运动',
-              translation: 'Nikmati setiap senaman anda'
-            }
-          }
-        }
-      },
-      variants: {
-        'question-height': {
-          'variant-01': { items: {} }
-        }
-      }
-    }
-  }
+window.REVIEWED_QUESTIONNAIRE_TRANSLATIONS = {
+  metadata: {
+    schemaVersion: 1,
+    sourceLocale: 'zh-CN',
+    targetLocale: 'ms',
+    targetLanguage: '马来语',
+    exportedAt: '2026-11-12T10:01:44.061Z'
+  },
+  pages: [{
+    order: 1,
+    name: 'prelude-splash',
+    label: '闪屏页面',
+    screenshot: '新增-前置01-闪屏页面.png',
+    items: [{
+      key: 'prelude-splash|manual|text|2',
+      sourceText: '享受你的运动',
+      translation: 'Nikmati setiap senaman anda',
+      dynamic: false,
+      modified: false
+    }]
+  }],
+  variants: {}
 }
 ```
 
-`translation-data-schema.mjs` 是 Codex 与 DeepSeek 生成器共用的结构构建模块；`migrate-translation-data-schema.mjs` 仅用于把旧版平铺字典一次性迁移到 schema v2。
+页面切换目标语言时只加载对应语言包，并在加载时校验语言、39 个主页面、22 个动态子页及稳定条目 key。查询参数按本次页面会话生成，刷新页面后会重新请求语言包，避免同名文件被浏览器旧缓存覆盖。
+
+更新核对译文时，可将页面导出的文件重命名为稳定文件名后直接覆盖，例如：
+
+```text
+reviewed-questionnaire-translations.en.js
+```
+
+无需转换数组或重新合并多语言总文件。`modified` 作为导出审计字段保留；文件重新作为运行时基准加载后，页面以其中的 `sourceText` 和 `translation` 为初始内容，本地已经保存的人工修改仍作为覆盖层保留。
+
+`translation-data-schema.mjs` 仍是 Codex 生成期总数据与 DeepSeek 数据共用的 schema v2 构建模块；`build-reviewed-translation-packages.mjs` 将 Codex 总数据生成八个与导出格式一致的运行时语言包；`migrate-translation-data-schema.mjs` 仅用于把旧版平铺字典一次性迁移到生成期 schema v2。
 
 ### 统一提示词约束
 

@@ -991,7 +991,6 @@
   <script src="assets/data/post-questionnaire-text.js?v=20261109-01"></script>
   <script src="assets/data/zh-questionnaire-variants.js?v=20261109-01"></script>
   <script src="assets/data/review-questionnaire-text.js?v=20261109-01"></script>
-  <script src="assets/data/ai-questionnaire-translations.js?v=20261112-01"></script>
   <script src="assets/data/deepseek-questionnaire-translations.js?v=20261112-01"></script>
   <script>
     (function () {
@@ -1005,6 +1004,8 @@
       const TRANSLATION_LANGUAGE_STORAGE_KEY = 'multilingual-page:translation-review-language:v1'
       const SCREENSHOT_LANGUAGE = 'zh'
       const ASSET_VERSION = '20261109-01'
+      const REVIEWED_TRANSLATION_SCHEMA_VERSION = 1
+      const TRANSLATION_PACKAGE_SESSION_VERSION = Date.now().toString(36)
       const baselinePages = (window.QUESTIONNAIRE_TEXTS ?? []).map(page => ({
         ...page,
         items: page.items.map(item => ({ ...item }))
@@ -1089,7 +1090,11 @@
       const reviewDrafts = new Map()
       let savedReviews = readSavedReviews()
       const translationReviewDrafts = new Map()
+      const reviewedTranslationPackages = new Map()
+      const reviewedTranslationPackageLoads = new Map()
       let savedTranslationReviews = readSavedTranslationReviews()
+      let reviewedTranslationLoadQueue = Promise.resolve()
+      let languageSelectionRequest = 0
       const AUTO_SAVE_DELAY_MS = 600
       let reviewAutoSaveTimer = null
       let translationReviewAutoSaveTimer = null
@@ -1161,6 +1166,120 @@
         }
       }
 
+      function validateReviewedTranslationPackage (data, language) {
+        const locale = languageCodes[language]
+        if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('语言包不是有效对象')
+        if (data.metadata?.schemaVersion !== REVIEWED_TRANSLATION_SCHEMA_VERSION) {
+          throw new Error(`不支持的 schemaVersion：${data.metadata?.schemaVersion ?? '缺失'}`)
+        }
+        if (data.metadata.sourceLocale !== 'zh-CN') throw new Error('sourceLocale 必须为 zh-CN')
+        if (data.metadata.targetLocale !== locale) {
+          throw new Error(`目标语言不匹配：期望 ${locale}，实际 ${data.metadata.targetLocale ?? '缺失'}`)
+        }
+        if (!Array.isArray(data.pages) || !data.variants || typeof data.variants !== 'object') {
+          throw new Error('语言包缺少 pages 或 variants')
+        }
+
+        const pagesByName = new Map(data.pages.map(page => [page?.name, page]))
+        if (pagesByName.size !== reviewPages.length || data.pages.length !== reviewPages.length) {
+          throw new Error(`主页面数量不匹配：期望 ${reviewPages.length}，实际 ${data.pages.length}`)
+        }
+
+        function validateItems (expectedItems, actualItems, targetName) {
+          if (!Array.isArray(actualItems) || actualItems.length !== expectedItems.length) {
+            throw new Error(`${targetName} 条目数量不匹配`)
+          }
+          const entries = new Map(actualItems.map(item => [item?.key, item]))
+          if (entries.size !== actualItems.length) throw new Error(`${targetName} 存在重复条目 key`)
+          expectedItems.forEach(item => {
+            const entry = entries.get(item.key)
+            if (!entry) throw new Error(`${targetName} 缺少条目：${item.key}`)
+            if (typeof entry.sourceText !== 'string' || typeof entry.translation !== 'string') {
+              throw new Error(`${targetName} 条目字段无效：${item.key}`)
+            }
+            if (typeof entry.dynamic !== 'boolean' || typeof entry.modified !== 'boolean') {
+              throw new Error(`${targetName} 条目状态无效：${item.key}`)
+            }
+          })
+        }
+
+        reviewPages.forEach(page => {
+          const target = pagesByName.get(page.name)
+          if (!target) throw new Error(`缺少主页面：${page.name}`)
+          validateItems(page.items, target.items, page.name)
+        })
+
+        const expectedVariantParents = Object.entries(window.REVIEW_QUESTIONNAIRE_VARIANTS ?? {})
+        const actualVariantParents = Object.keys(data.variants)
+        if (actualVariantParents.length !== expectedVariantParents.length) {
+          throw new Error(`动态子项父页面数量不匹配：期望 ${expectedVariantParents.length}，实际 ${actualVariantParents.length}`)
+        }
+        expectedVariantParents.forEach(([parentName, variants]) => {
+          const targets = data.variants[parentName]
+          if (!Array.isArray(targets) || targets.length !== variants.length) {
+            throw new Error(`${parentName} 动态子项数量不匹配`)
+          }
+          variants.forEach((variant, index) => {
+            const id = variantId(variant, index)
+            const target = targets.find(candidate => candidate?.id === id)
+            if (!target) throw new Error(`${parentName} 缺少动态子项：${id}`)
+            validateItems(variant.items ?? [], target.items, `${parentName}::${id}`)
+          })
+        })
+        return data
+      }
+
+      function reviewedTranslationAssetPath (language) {
+        const locale = languageCodes[language]
+        return `assets/data/reviewed-questionnaire-translations.${locale}.js?v=${TRANSLATION_PACKAGE_SESSION_VERSION}`
+      }
+
+      function loadReviewedTranslationPackage (language) {
+        if (language === 'zh') return Promise.resolve(undefined)
+        if (reviewedTranslationPackages.has(language)) {
+          return Promise.resolve(reviewedTranslationPackages.get(language))
+        }
+        if (reviewedTranslationPackageLoads.has(language)) return reviewedTranslationPackageLoads.get(language)
+
+        const load = reviewedTranslationLoadQueue.catch(function () {}).then(function () {
+          return new Promise(function (resolve, reject) {
+            const script = document.createElement('script')
+            script.src = reviewedTranslationAssetPath(language)
+            script.async = true
+            window.REVIEWED_QUESTIONNAIRE_TRANSLATIONS = undefined
+            script.addEventListener('load', function () {
+              script.remove()
+              try {
+                const data = validateReviewedTranslationPackage(window.REVIEWED_QUESTIONNAIRE_TRANSLATIONS, language)
+                reviewedTranslationPackages.set(language, data)
+                resolve(data)
+              } catch (error) {
+                reject(error)
+              }
+            })
+            script.addEventListener('error', function () {
+              script.remove()
+              reject(new Error(`无法加载 ${reviewedTranslationAssetPath(language)}`))
+            })
+            document.head.append(script)
+          })
+        })
+        reviewedTranslationLoadQueue = load
+        reviewedTranslationPackageLoads.set(language, load)
+        load.then(
+          function () { reviewedTranslationPackageLoads.delete(language) },
+          function () { reviewedTranslationPackageLoads.delete(language) }
+        )
+        return load
+      }
+
+      function reportTranslationPackageError (language, error) {
+        const message = `${languageLabels[language]}译文语言包加载失败：${error.message}`
+        elements.status.textContent = message
+        elements.translationReviewStatus.textContent = message
+        console.error(message, error)
+      }
+
       function reviewPageForIndex (pageIndex) {
         const baselinePage = baselinePages[pageIndex]
         return baselinePage ? reviewPagesByName.get(baselinePage.name) : undefined
@@ -1218,22 +1337,45 @@
       }
 
       function translationTargetData (data, language, page) {
-        const locale = data?.locales?.[language]
-        if (!locale || !page) return undefined
+        if (!data || !page) return undefined
+        if (Array.isArray(data.pages)) {
+          if (data.metadata?.targetLocale !== languageCodes[language]) return undefined
+          if (page.isVariant) {
+            return data.variants?.[page.parentPageName]?.find(variant => variant?.id === page.variantId)
+          }
+          return data.pages.find(candidate => candidate?.name === page.name)
+        }
+        const locale = data.locales?.[language]
+        if (!locale) return undefined
         if (page.isVariant) return locale.variants?.[page.parentPageName]?.[page.variantId]
         return locale.pages?.[page.name]
       }
 
       function translationItemValue (data, language, page, item) {
-        const entry = translationTargetData(data, language, page)?.items?.[item.key]
+        const items = translationTargetData(data, language, page)?.items
+        const entry = Array.isArray(items) ? items.find(candidate => candidate?.key === item.key) : items?.[item.key]
         return typeof entry?.translation === 'string' ? entry.translation : undefined
+      }
+
+      function translationItemSourceText (data, language, page, item) {
+        const items = translationTargetData(data, language, page)?.items
+        const entry = Array.isArray(items) ? items.find(candidate => candidate?.key === item.key) : items?.[item.key]
+        return typeof entry?.sourceText === 'string' ? entry.sourceText : undefined
+      }
+
+      function translationReviewSourceValues (page, language) {
+        const data = reviewedTranslationPackages.get(language)
+        const fallback = currentReviewValues(page)
+        return page.items.map((item, index) => (
+          translationItemSourceText(data, language, page, item) ?? fallback[index]
+        ))
       }
 
       function translationReviewInitialValues (page, language, sourceValues = currentReviewValues(page)) {
         return page.items.map((item, index) => {
           const sourceText = sourceValues[index] ?? item.text
           if (item.dynamic) return sourceText
-          return translationItemValue(window.AI_TRANSLATIONS, language, page, item) ?? ''
+          return translationItemValue(reviewedTranslationPackages.get(language), language, page, item) ?? ''
         })
       }
 
@@ -1518,8 +1660,8 @@
         const targetLanguage = languageLabels[currentLanguage]
         const isExternalLanguage = currentLanguage !== 'zh'
         const codexLabel = isExternalLanguage ? `Codex ${targetLanguage}` : 'Codex 中文校对'
-        const codexLocale = window.AI_TRANSLATIONS?.locales?.[currentLanguage]
-        const hasCodexLocale = !isExternalLanguage || Boolean(codexLocale)
+        const codexData = reviewedTranslationPackages.get(currentLanguage)
+        const hasCodexLocale = !isExternalLanguage || Boolean(codexData)
         const deepSeekData = window.DEEPSEEK_TRANSLATIONS ?? {}
         const deepSeekModel = deepSeekData.metadata?.model ?? 'deepseek-chat'
 
@@ -1547,13 +1689,16 @@
 
         elements.aiTranslationCount.textContent = `${page.items.length} 条`
         page.items.forEach((item, index) => {
-          const codexValue = translationItemValue(window.AI_TRANSLATIONS, currentLanguage, page, item)
+          const codexValue = translationItemValue(codexData, currentLanguage, page, item)
           const deepSeekValue = translationItemValue(deepSeekData, currentLanguage, page, item)
+          const sourceText = isExternalLanguage
+            ? (translationItemSourceText(codexData, currentLanguage, page, item) ?? item.text)
+            : item.text
           const hasCodexTranslation = !isExternalLanguage || item.dynamic || typeof codexValue === 'string'
           const codexTranslation = !isExternalLanguage || item.dynamic
-            ? item.text
+            ? sourceText
             : codexValue
-          const deepSeekTranslation = item.dynamic ? item.text : deepSeekValue
+          const deepSeekTranslation = item.dynamic ? sourceText : deepSeekValue
 
           const row = document.createElement('li')
           row.className = 'ai-translation-item'
@@ -1566,7 +1711,7 @@
           pair.className = 'translation-pair'
 
           pair.append(
-            createTranslationBlock({ label: '中文原文', text: item.text, lang: 'zh-CN' }),
+            createTranslationBlock({ label: '中文原文', text: sourceText, lang: 'zh-CN' }),
             createTranslationArrow(),
             createTranslationBlock({
               className: 'is-target',
@@ -1771,7 +1916,7 @@
           return
         }
 
-        const sourceValues = currentReviewValues(page)
+        const sourceValues = translationReviewSourceValues(page, language)
         const initialValues = translationReviewInitialValues(page, language, sourceValues)
         const values = currentTranslationReviewValues(page, language, sourceValues)
         elements.translationReviewCount.textContent = `${page.items.length} 条`
@@ -1937,7 +2082,7 @@
         const language = currentLanguage
         if (!page || language === 'zh') return
 
-        const sourceValues = currentReviewValues(page)
+        const sourceValues = translationReviewSourceValues(page, language)
         const initialValues = translationReviewInitialValues(page, language, sourceValues)
         const values = Array.from(
           elements.translationReviewList.querySelectorAll('.translation-review-textarea'),
@@ -2086,13 +2231,13 @@
       }
 
       function createReviewedTranslationPage (page, language) {
-        const savedSources = savedPageValues(page)
+        const packageSources = translationReviewSourceValues(page, language)
         const savedTranslations = savedTranslationReviews[language]?.[page.name] ?? {}
         const sourceValues = page.items.map((item, index) => {
           const savedValue = savedTranslations[item.key]
           return savedValue && typeof savedValue === 'object' && typeof savedValue.sourceText === 'string'
             ? savedValue.sourceText
-            : savedSources[index]
+            : packageSources[index]
         })
         const initialValues = translationReviewInitialValues(page, language, sourceValues)
         const translatedValues = savedTranslationValues(page, language, sourceValues)
@@ -2184,22 +2329,32 @@
 
       function selectLanguage (language, announce) {
         flushActiveReviewAutoSave()
-        currentLanguage = language
-        writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
-        if (currentLanguage !== 'zh') {
-          currentTranslationLanguage = currentLanguage
-          writeStorage(TRANSLATION_LANGUAGE_STORAGE_KEY, currentTranslationLanguage)
+        const request = ++languageSelectionRequest
+        if (language !== 'zh') {
+          elements.status.textContent = `正在加载${languageLabels[language]}译文语言包…`
+          elements.translationReviewStatus.textContent = `正在加载${languageLabels[language]}译文语言包…`
         }
-        selectReviewMode(currentLanguage === 'zh' ? 'baseline' : 'translation', false)
-        renderLanguage()
-        renderAiTranslations(currentPage)
-        renderActiveReview(currentPage)
+        return loadReviewedTranslationPackage(language).then(function () {
+          if (request !== languageSelectionRequest) return
+          currentLanguage = language
+          writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
+          if (currentLanguage !== 'zh') {
+            currentTranslationLanguage = currentLanguage
+            writeStorage(TRANSLATION_LANGUAGE_STORAGE_KEY, currentTranslationLanguage)
+          }
+          applyReviewMode(currentLanguage === 'zh' ? 'baseline' : 'translation', false)
+          renderLanguage()
+          renderAiTranslations(currentPage)
+          renderActiveReview(currentPage)
 
-        if (announce) {
-          document.dispatchEvent(new CustomEvent('languagechange', {
-            detail: { language: currentLanguage, label: languageLabels[currentLanguage] }
-          }))
-        }
+          if (announce) {
+            document.dispatchEvent(new CustomEvent('languagechange', {
+              detail: { language: currentLanguage, label: languageLabels[currentLanguage] }
+            }))
+          }
+        }).catch(function (error) {
+          if (request === languageSelectionRequest) reportTranslationPackageError(language, error)
+        })
       }
 
       function goToPage (pageIndex) {
@@ -2217,7 +2372,7 @@
         image.src = imagePath(SCREENSHOT_LANGUAGE, pageIndex)
       }
 
-      function selectReviewMode (mode, shouldRender = true) {
+      function applyReviewMode (mode, shouldRender = true) {
         if (!['baseline', 'translation'].includes(mode)) return
         const nextLanguage = mode === 'baseline'
           ? 'zh'
@@ -2240,6 +2395,25 @@
         elements.baselineReviewView.hidden = currentReviewMode !== 'baseline'
         elements.translationReviewView.hidden = currentReviewMode !== 'translation'
         if (shouldRender) renderActiveReview(currentPage)
+      }
+
+      function selectReviewMode (mode, shouldRender = true) {
+        if (!['baseline', 'translation'].includes(mode)) return Promise.resolve()
+        const nextLanguage = mode === 'baseline'
+          ? 'zh'
+          : (currentLanguage === 'zh' ? currentTranslationLanguage : currentLanguage)
+        flushActiveReviewAutoSave()
+        const request = ++languageSelectionRequest
+        if (nextLanguage !== 'zh') {
+          elements.status.textContent = `正在加载${languageLabels[nextLanguage]}译文语言包…`
+          elements.translationReviewStatus.textContent = `正在加载${languageLabels[nextLanguage]}译文语言包…`
+        }
+        return loadReviewedTranslationPackage(nextLanguage).then(function () {
+          if (request !== languageSelectionRequest) return
+          applyReviewMode(mode, shouldRender)
+        }).catch(function (error) {
+          if (request === languageSelectionRequest) reportTranslationPackageError(nextLanguage, error)
+        })
       }
 
       languageButtons.forEach((button, index) => {
@@ -2297,9 +2471,28 @@
       })
       window.addEventListener('pagehide', flushActiveReviewAutoSave)
 
-      renderLanguage()
-      selectReviewMode(currentReviewMode, false)
-      renderPage()
+      function initializePage () {
+        const initialLanguage = currentReviewMode === 'baseline'
+          ? 'zh'
+          : (currentLanguage === 'zh' ? currentTranslationLanguage : currentLanguage)
+        return loadReviewedTranslationPackage(initialLanguage).then(function () {
+          currentLanguage = initialLanguage
+          renderLanguage()
+          applyReviewMode(currentReviewMode, false)
+          renderPage()
+        }).catch(function (error) {
+          reportTranslationPackageError(initialLanguage, error)
+          currentLanguage = 'zh'
+          currentReviewMode = 'baseline'
+          writeStorage(LANGUAGE_STORAGE_KEY, currentLanguage)
+          writeStorage(REVIEW_MODE_STORAGE_KEY, currentReviewMode)
+          renderLanguage()
+          applyReviewMode(currentReviewMode, false)
+          renderPage()
+        })
+      }
+
+      initializePage()
     })()
   </script>
 </body>
