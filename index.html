@@ -1233,7 +1233,7 @@
 
       function translationPackageAssetPath (kind, language) {
         const locale = languageCodes[language]
-        return `assets/data/${kind}-questionnaire-translations.${locale}.js?v=${TRANSLATION_PACKAGE_SESSION_VERSION}`
+        return `assets/data/translations/${kind}/${kind}-questionnaire-translations.${locale}.js?v=${TRANSLATION_PACKAGE_SESSION_VERSION}`
       }
 
       function translationPackageStore (kind) {

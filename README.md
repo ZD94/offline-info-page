@@ -16,7 +16,7 @@
 - 八种非中文语言均覆盖 39 个主页面、22 个动态子页和 673 条页面内容。
 - 固定文案已进行语法和自然度校对；动态数字、体重和日期值按原值保留。
 - 选择“中文”时，右侧展示 Codex 中文校对结果。
-- Codex 原始候选位于 `assets/data/codex-questionnaire-translations.<locale>.js`；DeepSeek 原始候选位于 `assets/data/deepseek-questionnaire-translations.<locale>.js`；人工核对底稿位于 `assets/data/reviewed-questionnaire-translations.<locale>.js`。三类数据相互独立。
+- Codex 原始候选位于 `assets/data/translations/codex/codex-questionnaire-translations.<locale>.js`；DeepSeek 原始候选位于 `assets/data/translations/deepseek/deepseek-questionnaire-translations.<locale>.js`；人工核对底稿位于 `assets/data/translations/reviewed/reviewed-questionnaire-translations.<locale>.js`。三类数据按来源独立归档。
 - 这些文件都是静态数据，浏览器不会调用外部 AI 接口，也不会接触 API Key。
 
 三类语言包与“导出核对后的译文”完全同构，每种语言、每种数据类型各一个文件：
@@ -54,7 +54,7 @@ window.REVIEWED_QUESTIONNAIRE_TRANSLATIONS = {
 更新核对译文时，可将页面导出的文件重命名为稳定文件名后直接覆盖，例如：
 
 ```text
-reviewed-questionnaire-translations.en.js
+assets/data/translations/reviewed/reviewed-questionnaire-translations.en.js
 ```
 
 无需转换数组或重新合并多语言总文件。`modified` 作为导出审计字段保留；文件重新作为运行时基准加载后，页面以其中的 `sourceText` 和 `translation` 为初始内容，本地已经保存的人工修改仍作为覆盖层保留。
@@ -101,7 +101,7 @@ npm.cmd run web:translate:deepseek
 生成器只发送去重后的固定中文文案，不发送截图和动态用户数据。结果会写入：
 
 ```text
-offline-web-mvp/assets/data/deepseek-questionnaire-translations.<locale>.js
+offline-web-mvp/assets/data/translations/deepseek/deepseek-questionnaire-translations.<locale>.js
 ```
 
 逐文案缓存位于 `.qa-cache/deepseek-translations/`。中文、页面上下文、模型或提示词未变化时，再次运行不会重复请求；只有新增、修改、约束变化或校验失败的文案会重新调用接口。生成器会检查漏译、空译文和目标译文中的中文残留。
@@ -186,9 +186,10 @@ index.html
 assets/
 ├─ data/
 │  ├─ zh-questionnaire-text.js
-│  ├─ codex-questionnaire-translations.<locale>.js
-│  ├─ deepseek-questionnaire-translations.<locale>.js
-│  └─ reviewed-questionnaire-translations.<locale>.js
+│  └─ translations/
+│     ├─ codex/codex-questionnaire-translations.<locale>.js
+│     ├─ deepseek/deepseek-questionnaire-translations.<locale>.js
+│     └─ reviewed/reviewed-questionnaire-translations.<locale>.js
 └─ screenshots/
    └─ zh/01.png ... 39.png
 ```
